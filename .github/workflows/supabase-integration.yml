@@ -31,7 +31,7 @@ jobs:
           export SUPABASE_SECRET_KEY="$SECRET_KEY"
           npm install --no-save --package-lock=false playwright@1.65.1
           npx playwright install --with-deps chromium
-          npm run start -- --hostname 127.0.0.1 &
+          OPENAI_API_KEY=synthetic-test NODE_OPTIONS="--import=./scripts/browser-model-fixture.mjs" npm run start -- --hostname 127.0.0.1 &
           for i in {1..30}; do
             if curl -fsS http://127.0.0.1:3000/login -o /dev/null; then break; fi
             sleep 1

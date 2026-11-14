@@ -120,6 +120,10 @@ try {
   const parent = await login(browser, "parent@example.com", path);
   await parent.getByLabel("학급 코드").fill(code);
   await parent.getByRole("button", { name: "입장", exact: true }).click();
+  await parent.getByLabel("문의 내용").fill("When is the field trip?");
+  await parent.getByRole("button", { name: "문의 보내기" }).click();
+  await parent.getByText(/Field trip: November 24/).waitFor();
+  await parent.getByText(/schedule\.pdf 1쪽/).waitFor();
   await parent.getByLabel("문의 내용").fill("가상 학교 행사 문의");
   await parent.getByRole("button", { name: "문의 보내기" }).click();
   await parent.getByText(/선생님께 문의를 전달했습니다/).waitFor();
