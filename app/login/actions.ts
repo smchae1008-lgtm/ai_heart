@@ -23,5 +23,6 @@ export async function login(state: LoginState, form: FormData): Promise<LoginSta
   if (!/^\d{6,8}$/.test(token)) return { email, error: "메일에 있는 인증 코드를 입력해 주세요." };
   const { error } = await client.auth.verifyOtp({ email, token, type: "email" });
   if (error) return { email, error: "인증 코드가 일치하지 않거나 만료됐습니다." };
-  redirect("/account");
+  const next = String(form.get("next") ?? "");
+  redirect(/^\/class\/[0-9a-f-]{36}$/i.test(next) ? next : "/account");
 }

@@ -3,6 +3,9 @@ import { connection } from "next/server";
 import { createSupabaseClient } from "../../lib/supabase/server";
 import { schoolYear } from "../../lib/verification";
 import { submitCertificate } from "./actions";
+import { ClassForm, type Classroom } from "./class-form";
+import { rotateCode } from "./classes";
+import { verificationContext } from "../../lib/verification";
 
 export default async function AccountPage({ searchParams }: { searchParams: Promise<{ result?: string }> }) {
   await connection();
@@ -16,6 +19,14 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
     .select("status, rejection_reason").eq("teacher_id", account.sub)
     .eq("school_year", year).order("created_at", { ascending: false }).limit(1).maybeSingle();
   const canApply = !error && (!verification || verification.status === "rejected");
+  const context = await verificationContext();
+  const classes = context && await context.admin.from("classrooms").select("*")
+    .eq("teacher_id", account.sub).order("created_at", { ascending: false });
+  const classrooms = await Promise.all((classes?.data ?? []).map(async row => {
+    const admissions = await context!.admin.from("classroom_admissions").select("parent_id", { count: "exact", head: true })
+      .eq("classroom_id", row.id).eq("code_version", row.code_version);
+    return { classroom: row as Classroom, count: admissions.count };
+  }));
 
   return (
     <main>
@@ -24,7 +35,9 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
       {account.app_metadata?.maeumi_role === "operator" && <a href="/operations">교원 인증 검토</a>}
       <h2>{year}학년도 교원 인증</h2>
       {error && <p role="alert">인증 상태를 불러오지 못했습니다.</p>}
-      {submission && <p role="alert">{submission === "invalid"
+      {submission && <p role="alert">{submission === "class-denied" ? "이번 학년도 교원 인증을 먼저 승인받아 주세요."
+        : submission === "class-invalid" ? "학급 설정을 저장하지 못했습니다. 기간, 상담 시간, 공식 문의처를 확인해 주세요."
+        : submission === "invalid"
         ? "4 MB 이하의 PDF 증명서를 선택해 주세요."
         : "증명서를 제출하지 못했습니다. 잠시 후 다시 시도해 주세요."}</p>}
       {verification?.status === "pending" && <p>운영팀 검토 중입니다.</p>}
@@ -34,6 +47,22 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         <label>교원증명서 <input name="certificate" type="file" accept="application/pdf" required /></label>
         <button>{verification ? "다시 신청" : "인증 신청"}</button>
       </form>}
+      <h2>내 학급</h2>
+      {classes?.error && <p role="alert">학급을 불러오지 못했습니다.</p>}
+      {context && verification?.status === "approved" && <details><summary>새 학급 개설</summary><ClassForm /></details>}
+      {classrooms.map(({ classroom, count }) => (
+        <section key={classroom.id}>
+          <h3>{classroom.name}</h3>
+          <p>현재 코드 입장 계정 {count ?? "확인 불가"}</p>
+          {classroom.published && <a href={"/class/" + classroom.id}>학부모 링크 열기</a>}
+          <p>학급 코드 <code>{classroom.join_code}</code></p>
+          <form action={rotateCode}>
+            <input type="hidden" name="id" value={classroom.id} />
+            <button>코드 재발급</button>
+          </form>
+          <details><summary>학급 설정</summary><ClassForm classroom={classroom} /></details>
+        </section>
+      ))}
     </main>
   );
 }
