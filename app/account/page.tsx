@@ -4,7 +4,7 @@ import { createSupabaseClient } from "../../lib/supabase/server";
 import { schoolYear } from "../../lib/verification";
 import { submitCertificate } from "./actions";
 import { ClassForm, type Classroom } from "./class-form";
-import { rotateCode } from "./classes";
+import { deleteClass, rotateCode } from "./classes";
 import { uploadMaterial } from "./materials";
 import { Inbox } from "./inbox";
 import { verificationContext } from "../../lib/verification";
@@ -39,7 +39,10 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
       {account.app_metadata?.maeumi_role === "operator" && <a href="/operations">교원 인증 검토</a>}
       <h2>{year}학년도 교원 인증</h2>
       {error && <p role="alert">인증 상태를 불러오지 못했습니다.</p>}
-      {submission && <p role="alert">{submission === "class-denied" ? "이번 학년도 교원 인증을 먼저 승인받아 주세요."
+      {submission && <p role="alert">{submission === "delete-confirm" ? "학급 기록 삭제에 동의해 주세요."
+        : submission === "delete-failed" ? "학급 삭제를 시작하지 못했습니다."
+        : submission === "delete-retry" ? "새 문의는 차단됐습니다. 남은 학급 기록 삭제를 다시 시도해 주세요."
+        : submission === "class-denied" ? "이번 학년도 교원 인증을 먼저 승인받아 주세요."
         : submission === "material-invalid" ? "4 MB 이하의 텍스트가 포함된 학사일정 PDF를 선택해 주세요."
         : submission === "material-failed" ? "학사일정 PDF를 저장하지 못했습니다."
         : submission === "class-invalid" ? "학급 설정을 저장하지 못했습니다. 기간, 상담 시간, 공식 문의처를 확인해 주세요."
@@ -62,7 +65,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <p>현재 코드 입장 계정 {count ?? "확인 불가"}</p>
           {classroom.published && <a href={"/class/" + classroom.id}>학부모 링크 열기</a>}
           <p>학급 코드 <code>{classroom.join_code}</code></p>
-          <form action={rotateCode}>
+          {!classroom.deleting && <><form action={rotateCode}>
             <input type="hidden" name="id" value={classroom.id} />
             <button>코드 재발급</button>
           </form>
@@ -75,6 +78,14 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               <input type="hidden" name="id" value={classroom.id} />
               <label>학사일정 PDF <input type="file" name="material" accept="application/pdf" required /></label>
               <button>PDF 등록</button>
+            </form>
+          </details></>}
+          <details>
+            <summary>{classroom.deleting ? "학급 삭제 재시도" : "학급 삭제"}</summary>
+            <form action={deleteClass}>
+              <input type="hidden" name="id" value={classroom.id} />
+              <label><input type="checkbox" name="confirm" required /> 이 학급의 PDF, 문의, 입장 기록을 삭제합니다.</label>
+              <button>학급 데이터 삭제</button>
             </form>
           </details>
         </section>

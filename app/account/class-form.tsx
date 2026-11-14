@@ -16,7 +16,7 @@ const previews = [
 export type Classroom = {
   id: string; name: string; starts_on: string; ends_on: string; official_contact: string;
   greeting: string; tone: number; consultation: Record<string, [string, string]>; published: boolean;
-  join_code: string;
+  join_code: string; deleting: boolean;
 };
 
 export function ClassForm({ classroom }: { classroom?: Classroom }) {

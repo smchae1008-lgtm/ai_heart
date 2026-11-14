@@ -10,7 +10,7 @@ export async function uploadMaterial(form: FormData) {
   if (!context) redirect("/login");
   const id = String(form.get("id") ?? "");
   const { data: classroom } = await context.admin.from("classrooms").select("id")
-    .eq("id", id).eq("teacher_id", context.user.id).maybeSingle();
+    .eq("id", id).eq("teacher_id", context.user.id).eq("deleting", false).maybeSingle();
   if (!classroom) redirect("/account?result=material-failed");
   const file = form.get("material");
   if (!(file instanceof File) || file.size > maxCertificateBytes || file.type !== "application/pdf" ||
