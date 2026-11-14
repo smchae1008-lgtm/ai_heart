@@ -6,6 +6,7 @@ import { submitCertificate } from "./actions";
 import { ClassForm, type Classroom } from "./class-form";
 import { rotateCode } from "./classes";
 import { uploadMaterial } from "./materials";
+import { Inbox } from "./inbox";
 import { verificationContext } from "../../lib/verification";
 
 export default async function AccountPage({ searchParams }: { searchParams: Promise<{ result?: string }> }) {
@@ -66,6 +67,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             <button>코드 재발급</button>
           </form>
           <details><summary>학급 설정</summary><ClassForm classroom={classroom} /></details>
+          <Inbox classroomId={classroom.id} />
           <details>
             <summary>학사일정 PDF</summary>
             <ul>{materials.map(material => <li key={material.id}>{material.name}</li>)}</ul>
