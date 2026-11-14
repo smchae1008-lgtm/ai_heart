@@ -33,6 +33,8 @@ try {
     await db.exec(await readFile(new URL(file, directory), "utf8"));
   }
   await db.query("insert into auth.users values ($1),($2),($3)", [teacher, outsider, parent]);
+  const verificationId = randomUUID();
+  await db.query("insert into public.teacher_verifications (id,teacher_id,school_year,certificate_path) values ($1,$2,2026,'private.pdf')", [verificationId, teacher]);
   await db.query(`insert into public.classrooms
     (id,teacher_id,name,starts_on,ends_on,official_contact,greeting,published,join_code,consultation)
     values ($1,$2,'Test class','2000-01-01','2100-01-01','Test office','Hello',true,$3,$4)`,
@@ -42,13 +44,31 @@ try {
   await db.query("select set_config('request.jwt.claim.sub',$1,false)", [outsider]);
   await db.exec("set role authenticated");
   assert.equal((await db.query("select id from public.classrooms")).rows.length, 0);
+  assert.equal((await db.query("select id from public.teacher_verifications")).rows.length, 0);
   await assert.rejects(db.query("select * from public.classroom_inquiries"), /permission denied/);
   await assert.rejects(db.query("select public.rotate_classroom_code($1,$2)", [classId, teacher]), /permission denied/);
   await db.exec("reset role");
+  await db.query("select set_config('request.jwt.claim.sub',$1,false)", [teacher]);
+  await db.exec("set role authenticated");
+  assert.equal((await db.query("select status from public.teacher_verifications")).rows[0].status, "pending");
+  await assert.rejects(db.query("select certificate_path from public.teacher_verifications"), /permission denied/);
+  await assert.rejects(db.query("update public.teacher_verifications set status='approved'"), /permission denied/);
+  await db.exec("reset role");
   await db.exec("set role service_role");
+  await db.query("update public.teacher_verifications set status='rejected', rejection_reason='Synthetic reason', reviewed_at=now(), certificate_path=null where id=$1", [verificationId]);
+  await db.query("insert into public.teacher_verifications (teacher_id,school_year) values ($1,2026)", [teacher]);
+  await assert.rejects(db.query("insert into public.teacher_verifications (teacher_id,school_year) values ($1,2026)", [teacher]), /duplicate key/);
   const join = async (value) => (await db.query("select public.join_classroom($1,$2,$3) as ok", [classId,parent,value])).rows[0].ok;
   assert.equal(await join(randomUUID()), false);
   assert.equal(await join(code), true);
+  await db.exec(`update public.classrooms set consultation = jsonb_build_object(
+    ((extract(dow from (now() at time zone 'Asia/Seoul'))::integer + 1) % 7)::text,
+    jsonb_build_array('09:00','10:00'))`);
+  const deferredId = randomUUID();
+  assert.equal(await submit(deferredId, "general", "low"), true);
+  const deferred = (await db.query("select notify_at > now() as deferred, reply from public.classroom_inquiries where id=$1", [deferredId])).rows[0];
+  assert.equal(deferred.deferred, true);
+  assert.match(deferred.reply, /다음 상담 시간/);
   assert.equal(await join(code), true);
   assert.equal((await db.query("select * from public.classroom_admissions")).rows.length, 1);
   const urgentId = randomUUID();
