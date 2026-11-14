@@ -4,15 +4,16 @@
 
 ## 확인한 상태
 
-- Node.js 24에서 프로덕션 빌드와 TypeScript 검사를 통과했다. 구현 브랜치에 교원 인증, 학급 설정·입장, PDF, AI 응대, 받은함·알림, 삭제 코드가 있다.
-- `npm run test:db`로 가상 데이터와 격리된 PostgreSQL에서 전체 마이그레이션, 학급 소유권, 코드 회전, 중복 문의, 경고 후 종료, 학급 종료 및 DB 연쇄 삭제를 검증했다.
-- Windows 개발 환경에서 Supabase CLI를 초기화했다. Docker와 Podman이 없어 로컬 스택이 시작되지 않았다. Supabase Auth·Storage를 포함한 역할별 검수는 대기 중이다.
-- 운영 DB는 변경하지 않았다. 운영 Vercel 프로젝트 조회는 팀 권한 확인이 필요하다. [초안 PR #1](https://github.com/smchae1008-lgtm/ai_heart/pull/1)을 열었으며 최초 커밋의 Vercel 체크는 성공했다. 전체 흐름 검수, main 병합, 병합 커밋의 운영 Ready 확인은 대기 중이다.
+- [GitHub Actions 브라우저 검수](https://github.com/smchae1008-lgtm/ai_heart/actions/runs/43612968039)에서 격리된 Supabase를 시작하고 가상 계정 3개의 OTP 로그인, 증명서 반려·재신청·승인·삭제, 학급 개설, 코드 입장과 인원 수, PDF 업로드, 교사의 문의 원문 열람, 학부모의 원문 접근 차단, 학급 삭제에 따른 Storage와 DB 정리를 검증했다. PDF 근거 답변은 가상 모델 응답으로 검증했다.
+- `npm run test:db`로 마이그레이션, RLS, 학급 코드 재발급, 문의 중복 방지, 경고 후 대화 종료와 상담 시간에 따른 알림을 확인했다. 같은 CI에서 Auth API 연결과 Next.js 빌드도 통과했다.
+- 별도 OpenAI 개발 호출에서 `gpt-6-luna`로 일정 원문 인용, 근거 부족 시 일반민원, 안전 문의 긴급도 상, 개인번호 요구의 악성민원, 악성민원과 긴급도 상의 동시 분류를 확인했다. 기존 기본 모델 `gpt-5.6-luna`는 사용한 개발 키에서 잔액 부족 오류를 반환했다.
+- [PR #1](https://github.com/smchae1008-lgtm/ai_heart/pull/1)은 초안이다. 운영 Supabase에 신규 테이블이 아직 없고 Vercel 팀 API는 접근 권한 오류를 반환했다. 운영 적용과 운영 Ready 검증이 남아 있다.
 
-- 가상 문의로 OpenAI 분류기를 호출했다. `OPENAI_MODEL=gpt-6-luna`로 학사일정 원문 인용, 자료에 없는 준비물의 일반민원 분류, 학생 안전 문의의 긴급도 상, 교사 개인 연락처 요청의 악성민원 분류를 확인했다. 일정 문의는 첫 호출에서 결과가 없었고 재검증에서 성공했다. 기본 모델 `gpt-5.6-luna`는 현재 키로 잔액 부족 응답을 반환했다.
-- 구현 커밋 `a147f67`의 GitHub Vercel 배포 체크가 성공했다.
+## 운영 배포 범위
 
-- 한 페이지짜리 가상 PDF로 앱이 사용하는 파서에서 페이지 번호와 학사일정 텍스트를 추출했다. 업로드 및 Storage 삭제는 개발 스택에서 검증할 예정이다.
+운영 Supabase `rikwramzpveuofxdlzha`에 `supabase/migrations/`의 SQL 5개를 순서대로 적용한다. 교원 인증, 학급·입장, 자료, 민원 테이블과 접근 정책, RPC, 비공개 Storage 버킷 2개를 생성한다. 기존 운영 데이터를 수정하거나 삭제하는 SQL은 포함되어 있지 않다.
+
+운영 Supabase의 이메일 OTP 템플릿과 발송 설정을 확인한다. Vercel `ai-heart/ai_heart` Production에 Supabase URL·Publishable key·서버 전용 Secret key, OpenAI 키와 호출 가능한 모델을 설정한다. 마이그레이션 적용 후 main에 병합하고, Vercel 배포가 Ready인 커밋과 운영 로그인 및 앱의 DB 연결을 확인한다.
 
 ## 가상 데이터 검수 절차
 
