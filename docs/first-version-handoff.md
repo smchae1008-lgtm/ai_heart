@@ -5,7 +5,8 @@
 ## 확인한 상태
 
 - Node.js 24에서 프로덕션 빌드와 TypeScript 검사를 통과했다. 구현 브랜치에 교원 인증, 학급 설정·입장, PDF, AI 응대, 받은함·알림, 삭제 코드가 있다.
-- Windows 개발 환경에서 Supabase CLI를 초기화했다. Docker와 Podman이 없어 로컬 스택이 시작되지 않았다. 마이그레이션 적용 및 실서비스 역할 검증은 대기 중이다.
+- `npm run test:db`로 가상 데이터와 격리된 PostgreSQL에서 전체 마이그레이션, 학급 소유권, 코드 회전, 중복 문의, 경고 후 종료, 학급 종료 및 DB 연쇄 삭제를 검증했다.
+- Windows 개발 환경에서 Supabase CLI를 초기화했다. Docker와 Podman이 없어 로컬 스택이 시작되지 않았다. Supabase Auth·Storage를 포함한 역할별 검수는 대기 중이다.
 - 운영 DB는 변경하지 않았다. 운영 Vercel 프로젝트 조회는 팀 권한 확인이 필요하다. PR 검수, main 병합, 최신 커밋의 운영 Ready 확인은 대기 중이다.
 
 ## 가상 데이터 검수 절차
