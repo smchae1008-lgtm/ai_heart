@@ -9,6 +9,9 @@
 - Windows 개발 환경에서 Supabase CLI를 초기화했다. Docker와 Podman이 없어 로컬 스택이 시작되지 않았다. Supabase Auth·Storage를 포함한 역할별 검수는 대기 중이다.
 - 운영 DB는 변경하지 않았다. 운영 Vercel 프로젝트 조회는 팀 권한 확인이 필요하다. [초안 PR #1](https://github.com/smchae1008-lgtm/ai_heart/pull/1)을 열었으며 최초 커밋의 Vercel 체크는 성공했다. 전체 흐름 검수, main 병합, 병합 커밋의 운영 Ready 확인은 대기 중이다.
 
+- 가상 문의로 OpenAI 분류기를 호출했다. `OPENAI_MODEL=gpt-6-luna`로 학사일정 원문 인용, 자료에 없는 준비물의 일반민원 분류, 학생 안전 문의의 긴급도 상, 교사 개인 연락처 요청의 악성민원 분류를 확인했다. 일정 문의는 첫 호출에서 결과가 없었고 재검증에서 성공했다. 기본 모델 `gpt-5.6-luna`는 현재 키로 잔액 부족 응답을 반환했다.
+- 구현 커밋 `a147f67`의 GitHub Vercel 배포 체크가 성공했다.
+
 ## 가상 데이터 검수 절차
 
 1. 개발용 Supabase를 시작하고 마이그레이션을 적용한다. 개발용 URL과 Publishable key, 서버 전용 Secret key를 로컬 환경에 설정한다. Mailpit으로 OTP를 받는다. 운영팀 테스트 계정에 관리자 절차로 `app_metadata.maeumi_role=operator`를 지정한다.
