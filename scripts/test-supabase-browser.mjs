@@ -36,6 +36,27 @@ async function login(browser, email, next = "/account") {
   return page;
 }
 
+function syntheticSchedule() {
+  const stream = "BT /F1 12 Tf 72 720 Td (Field trip: November 24) Tj ET";
+  const objects = [
+    "<< /Type /Catalog /Pages 2 0 R >>",
+    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    "<< /Length " + stream.length + " >>\nstream\n" + stream + "\nendstream",
+  ];
+  let pdf = "%PDF-1.4\n";
+  const offsets = objects.map((object, index) => {
+    const offset = pdf.length;
+    pdf += (index + 1) + " 0 obj\n" + object + "\nendobj\n";
+    return String(offset).padStart(10, "0") + " 00000 n \n";
+  });
+  const xref = pdf.length;
+  pdf += "xref\n0 6\n0000000000 65535 f \n" + offsets.join("") +
+    "trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF\n";
+  return Buffer.from(pdf);
+}
+
 const operatorEmail = "operator@example.com";
 result(await admin.auth.admin.createUser({
   email: operatorEmail, email_confirm: true, app_metadata: { maeumi_role: "operator" },
@@ -83,6 +104,19 @@ try {
   await classLink.waitFor();
   const path = await classLink.getAttribute("href");
   const code = await teacher.locator("code").innerText();
+  const classId = path.split("/").at(-1);
+  await teacher.getByText("학사일정 PDF", { exact: true }).first().click();
+  await teacher.locator('[name=material]').setInputFiles({
+    name: "schedule.pdf", mimeType: "application/pdf", buffer: syntheticSchedule(),
+  });
+  await teacher.getByRole("button", { name: "PDF 등록" }).click();
+  await teacher.getByText("schedule.pdf").waitFor({ state: "attached" });
+  const material = result(await admin.from("classroom_materials")
+    .select("storage_path,pages").eq("classroom_id", classId).single());
+  assert.equal(material.pages[0].number, 1);
+  assert.match(material.pages[0].text, /Field trip: November 24/);
+  const materials = admin.storage.from("classroom-materials");
+  assert.ok(result(await materials.download(material.storage_path)));
   const parent = await login(browser, "parent@example.com", path);
   await parent.getByLabel("학급 코드").fill(code);
   await parent.getByRole("button", { name: "입장", exact: true }).click();
@@ -93,7 +127,17 @@ try {
   await teacher.getByText("현재 코드 입장 계정 1").waitFor();
   await teacher.getByRole("link", { name: "문의 원문 보기" }).click();
   await teacher.getByText("가상 학교 행사 문의").waitFor();
-  console.log("PASS: browser OTP, certificate review and deletion, class admission, inquiry and teacher inbox");
+  const original = teacher.url();
+  assert.equal((await parent.request.get(original)).status(), 404);
+  await teacher.getByRole("link", { name: "받은함으로 돌아가기" }).click();
+  await teacher.getByText("학급 삭제", { exact: true }).click();
+  await teacher.locator('[name=confirm]').check();
+  await teacher.getByRole("button", { name: "학급 데이터 삭제" }).click();
+  await teacher.getByRole("heading", { name: "가상 학급" }).waitFor({ state: "detached" });
+  assert.ok((await materials.download(material.storage_path)).error);
+  assert.equal(result(await admin.from("classroom_inquiries").select("id").eq("classroom_id", classId)).length, 0);
+  assert.equal((await parent.request.get(origin + path)).status(), 404);
+  console.log("PASS: browser OTP, certificate review and deletion, class admission, teacher inbox, PDF upload and classroom deletion");
 } finally {
   await browser.close();
 }
