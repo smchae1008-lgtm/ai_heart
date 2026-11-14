@@ -1,7 +1,5 @@
 name: Supabase integration
 on:
-  push:
-    branches: [codex/maeumi-first-version]
   pull_request:
 permissions:
   contents: read
@@ -29,3 +27,13 @@ jobs:
           npm run check:supabase
           npm run test:db
           npm run build
+
+          export SUPABASE_SECRET_KEY="$SECRET_KEY"
+          npm install --no-save --package-lock=false playwright@1.65.1
+          npx playwright install --with-deps chromium
+          npm run start -- --hostname 127.0.0.1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:3000/login -o /dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/test-supabase-browser.mjs
