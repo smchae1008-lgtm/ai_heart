@@ -1,0 +1,269 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>AI 마음이 · 프로토타입</title><style>body{margin:0;background:#f5f2ea} #maeumi-flow{max-width:1040px;margin:auto}</style></head><body>
+<section id="maeumi-flow" lang="ko" aria-label="AI 마음이 학급 개설 흐름">
+  <header class="mf-bar"><strong><span class="mf-mark" aria-hidden="true">♡</span> AI 마음이</strong><span>테스트 프로토타입 · 예시 데이터</span></header>
+  <nav aria-label="화면 순서"><ol class="mf-route">
+    <li><button type="button" data-show="login" aria-current="step">로그인</button></li>
+    <li><button type="button" data-show="verify">교원 인증</button></li>
+    <li><button type="button" data-show="class">학급 개설</button></li>
+    <li><button type="button" data-show="chat">챗봇 설정</button></li>
+    <li><button type="button" data-show="materials">학습자료</button></li>
+    <li><button type="button" data-show="share">링크 공개</button></li>
+    <li><button type="button" data-show="parent">학부모 입장</button></li>
+    <li><button type="button" data-show="inbox">교사 받은함</button></li>
+  </ol></nav>
+  <div class="mf-stage">
+    <section class="mf-screen" data-screen="login" aria-labelledby="mf-login">
+      <h2 id="mf-login">교사 로그인</h2>
+      <p>이메일로 일회용 코드를 받아 로그인합니다.</p>
+      <form data-action="email">
+        <label>이메일<input name="email" type="email" value="teacher@example.com" required></label>
+        <button class="mf-primary" type="submit">예시 인증 코드 받기</button>
+      </form>
+      <form data-action="login" hidden>
+        <label>이메일 인증 코드<input name="code" inputmode="numeric" pattern="[0-9]{6}" value="246810" required></label>
+        <button class="mf-primary" type="submit">로그인</button>
+      </form>
+    </section>
+    <section class="mf-screen" data-screen="verify" aria-labelledby="mf-verify" hidden>
+      <h2 id="mf-verify">교원 인증</h2>
+      <p>운영팀이 교원증명서를 확인한 뒤 학급을 개설할 수 있어요.</p>
+      <div class="mf-file"><strong>교원증명서.pdf</strong><span>미리보기용 예시 파일</span></div>
+      <button type="button" class="mf-primary" data-apply>예시 증명서 제출</button>
+      <div class="mf-notice" data-review hidden><strong>운영팀 승인 대기</strong><p>승인되면 증명서 파일이 삭제됩니다.</p><button type="button" class="mf-secondary" data-next="class">승인된 화면 보기</button></div>
+    </section>
+    <section class="mf-screen" data-screen="class" aria-labelledby="mf-class" hidden>
+      <span class="mf-status">교원 인증 완료</span>
+      <h2 id="mf-class">새 학급 개설</h2>
+      <form data-action="class">
+        <label>학급명<input id="mf-classname" value="햇살초 3학년 2반" required></label>
+        <div class="mf-pair">
+          <label>운영 시작일<input id="mf-start" type="date" value="2026-11-17" required></label>
+          <label>운영 종료일<input id="mf-end" type="date" value="2027-02-28" required></label>
+        </div>
+        <fieldset><legend>요일별 상담 시간</legend>
+          <div class="mf-days">
+            <label><input type="checkbox" checked> 월</label><label><input type="checkbox" checked> 화</label><label><input type="checkbox" checked> 수</label><label><input type="checkbox" checked> 목</label><label><input type="checkbox" checked> 금</label>
+          </div>
+          <div class="mf-pair"><label>상담 시작<input type="time" value="14:00" required></label><label>상담 종료<input type="time" value="16:00" required></label></div>
+        </fieldset>
+        <label>학교 공식 문의처<input id="mf-contact-input" value="교무실 · 031-000-0000" required></label>
+        <small>학급 링크를 공개하려면 공식 문의처가 하나 이상 필요합니다.</small>
+        <button type="submit" class="mf-primary">학급 만들기</button>
+      </form>
+    </section>
+    <section class="mf-screen" data-screen="chat" aria-labelledby="mf-chat" hidden>
+      <span class="mf-status" data-classname>햇살초 3학년 2반</span>
+      <h2 id="mf-chat">챗봇 설정</h2>
+      <label>첫인사 템플릿<select id="mf-template"><option value="0">기본형</option><option value="1">간결형</option><option value="2">환영형</option></select></label>
+      <label>첫인사 문구<textarea id="mf-greeting" rows="3">안녕하세요. 우리 학급 안내 챗봇입니다. 학급 일정이나 준비물이 궁금하시면 문의해 주세요.</textarea></label>
+      <label>답변 말투<select id="mf-tone"><option value="0">1 · 간결</option><option value="1">2 · 차분</option><option value="2" selected>3 · 기본</option><option value="3">4 · 친절</option><option value="4">5 · 따뜻</option></select></label>
+      <div class="mf-notice"><small>질문 예시 · 체험학습 준비물이 뭐예요?</small><p id="mf-tone-example" aria-live="polite">체험학습에는 물과 도시락을 준비해 주세요.</p></div>
+      <button type="button" class="mf-primary" data-next="materials">저장하고 학습자료로</button>
+    </section>
+    <section class="mf-screen" data-screen="materials" aria-labelledby="mf-materials" hidden>
+      <span class="mf-status" data-classname>햇살초 3학년 2반</span>
+      <h2 id="mf-materials">챗봇 학습자료</h2>
+      <p>학사일정 PDF를 등록하면 이 학급의 준비물과 행사 일정 답변에 사용합니다.</p>
+      <div class="mf-file"><strong>학사일정_11월.pdf</strong><span id="mf-file-status" aria-live="polite">예시 PDF · 등록 전</span></div>
+      <button type="button" class="mf-secondary" data-upload>예시 PDF 등록</button>
+      <div class="mf-notice" data-answer hidden>
+        <small>질문 예시 · 체험학습은 언제예요?</small>
+        <p>학사일정에 따르면 11월 20일에 체험학습을 진행합니다.</p>
+        <small>근거 · 학사일정_11월.pdf</small>
+      </div>
+      <button type="button" class="mf-primary" data-next="share">링크 공개 설정으로</button>
+    </section>
+    <section class="mf-screen" data-screen="share" aria-labelledby="mf-share" hidden>
+      <h2 id="mf-share">학부모 링크 공개</h2>
+      <div class="mf-file"><strong data-classname>햇살초 3학년 2반</strong><span id="mf-contact-summary">교무실 · 031-000-0000</span></div>
+      <button type="button" class="mf-primary" data-publish>학급 링크 공개하기</button>
+      <div class="mf-notice" data-shared hidden>
+        <strong>학급 링크 공개 완료</strong>
+        <label>학부모 링크<input value="https://example.com/class/haetsal-32" readonly></label>
+        <label>학급 코드<input value="MAEUM32" readonly></label>
+        <p>학부모는 이메일 로그인 후 학급 코드를 입력해야 입장할 수 있어요.</p>
+        <button type="button" class="mf-secondary" data-next="parent">학부모 입장 화면 보기</button>
+      </div>
+    </section>
+    <section class="mf-screen" data-screen="parent" aria-labelledby="mf-parent" hidden>
+      <span class="mf-status" data-classname>햇살초 3학년 2반</span>
+      <h2 id="mf-parent">학부모 입장</h2>
+      <p>이메일 로그인 후 안내받은 학급 코드를 입력하세요.</p>
+      <button type="button" class="mf-primary" data-parent-login>예시 이메일로 로그인</button>
+      <form data-action="parent" hidden>
+        <label>학급 코드<input name="classcode" value="MAEUM32" required></label>
+        <button class="mf-primary" type="submit">챗봇 입장</button>
+      </form>
+      <div class="mf-notice" data-parent-chat hidden>
+        <strong>AI 마음이 · 학급 안내</strong><p id="mf-parent-greeting"></p>
+        <div id="mf-conversation" class="mf-conversation" aria-live="polite"></div>
+        <form id="mf-message-form">
+          <label>테스트 문의
+            <select name="scenario">
+              <option value="simple">체험학습은 언제예요?</option>
+              <option value="normal">체험학습에 여벌 옷도 필요한가요?</option>
+              <option value="urgent">아이가 다쳤어요. 지금 안전 확인이 필요해요.</option>
+              <option value="abuse">선생님 개인 전화번호를 알려 주세요.</option>
+            </select>
+          </label>
+          <button type="submit" class="mf-primary">문의 보내기</button>
+        </form>
+        <button type="button" class="mf-secondary" data-next="inbox">교사 받은함 보기</button>
+      </div>
+    </section>
+    <section class="mf-screen" data-screen="inbox" aria-labelledby="mf-inbox" hidden>
+      <span class="mf-status" data-classname>햇살초 3학년 2반</span>
+      <h2 id="mf-inbox">받은 문의</h2>
+      <p>학급 코드 입장 계정 <strong id="mf-member-count">0</strong>명</p>
+      <p id="mf-empty-inbox">접수된 문의가 없습니다.</p>
+      <ul id="mf-inbox-list" class="mf-inbox-list" aria-live="polite"></ul>
+    </section>
+  </div>
+</section>
+<style>
+  #maeumi-flow {
+    color-scheme:light;
+    --mf-paper:#fffefb;--mf-bg:#f5f2ea;--mf-ink:#222d28;--mf-muted:#53635a;
+    --mf-green:#265d4d;--mf-soft:#e3eee7;--mf-line:#d9ded4;
+    background:var(--mf-bg);color:var(--mf-ink);font:15px/1.55 Pretendard,"Noto Sans KR","Malgun Gothic",sans-serif;
+  }
+  #maeumi-flow *{box-sizing:border-box}
+  #maeumi-flow [hidden]{display:none!important}
+  #maeumi-flow p,#maeumi-flow h2{margin:0}
+  #maeumi-flow h2{font-size:26px;letter-spacing:-.045em;line-height:1.25}
+  #maeumi-flow button,#maeumi-flow input,#maeumi-flow select,#maeumi-flow textarea{font:inherit}
+  #maeumi-flow button{min-height:44px;cursor:pointer}
+  #maeumi-flow button:disabled{cursor:default;opacity:.6}
+  #maeumi-flow :focus-visible{outline:2px solid var(--mf-green);outline-offset:2px}
+  #maeumi-flow .mf-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:14px 24px;border-bottom:1px solid var(--mf-line)}
+  #maeumi-flow .mf-bar>span,#maeumi-flow small,#maeumi-flow .mf-file>span{font-size:13px;color:var(--mf-muted)}
+  #maeumi-flow .mf-mark{display:inline-grid;place-items:center;width:32px;height:32px;margin-right:4px;border-radius:10px;background:var(--mf-green);color:var(--mf-paper);font-size:21px}
+  #maeumi-flow .mf-route{list-style:none;display:flex;flex-wrap:wrap;gap:4px 8px;margin:0;padding:12px 24px}
+  #maeumi-flow .mf-route li{display:flex;align-items:center;gap:8px}
+  #maeumi-flow .mf-route li:not(:last-child)::after{content:"›";color:var(--mf-muted)}
+  #maeumi-flow .mf-route button{border:0;border-radius:10px;padding:6px 9px;background:transparent;color:var(--mf-muted)}
+  #maeumi-flow .mf-route [aria-current]{background:var(--mf-soft);color:var(--mf-green);font-weight:700}
+  #maeumi-flow .mf-stage{display:grid;justify-items:center;padding:18px 24px 28px;border-top:1px solid var(--mf-line)}
+  #maeumi-flow .mf-screen{display:grid;gap:12px;width:min(100%,520px);padding:24px;background:var(--mf-paper);border:1px solid var(--mf-line);border-radius:16px;min-width:0}
+  #maeumi-flow form,#maeumi-flow label,#maeumi-flow .mf-file,#maeumi-flow .mf-notice{display:grid;gap:6px;min-width:0}
+  #maeumi-flow form,#maeumi-flow .mf-notice{gap:12px}
+  #maeumi-flow input:not([type=checkbox]),#maeumi-flow select,#maeumi-flow textarea{width:100%;min-width:0;min-height:44px;padding:8px 10px;border:1px solid #abb8af;border-radius:10px;background:var(--mf-paper);color:var(--mf-ink)}
+  #maeumi-flow .mf-primary,#maeumi-flow .mf-secondary{justify-self:start;padding:8px 14px;border-radius:10px;border:1px solid var(--mf-green)}
+  #maeumi-flow .mf-primary{background:var(--mf-green);color:var(--mf-paper)}
+  #maeumi-flow .mf-secondary{background:var(--mf-paper);color:var(--mf-green)}
+  #maeumi-flow .mf-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  #maeumi-flow fieldset{min-width:0;margin:0;padding:8px 12px 12px;border:1px solid var(--mf-line);border-radius:10px}
+  #maeumi-flow .mf-days{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  #maeumi-flow .mf-days label{display:flex;align-items:center;min-height:44px;min-width:44px}
+  #maeumi-flow .mf-file,#maeumi-flow .mf-notice{padding:12px;border:1px solid var(--mf-line);border-radius:10px;overflow-wrap:anywhere}
+  #maeumi-flow .mf-notice,#maeumi-flow .mf-status{background:var(--mf-soft);color:var(--mf-green)}
+  #maeumi-flow .mf-status{justify-self:start;padding:3px 8px;border-radius:16px;font-size:13px}
+  #maeumi-flow .mf-conversation{display:grid;gap:8px}
+  #maeumi-flow .mf-chat-line{padding:8px 10px;border-radius:10px;background:var(--mf-paper);overflow-wrap:anywhere}
+  #maeumi-flow .mf-inbox-list{padding:0;margin:0;list-style:none;display:grid;gap:10px}
+  #maeumi-flow .mf-inbox-list>li{display:grid;gap:6px;padding:12px;border:1px solid var(--mf-line);border-radius:10px}
+  #maeumi-flow .mf-inbox-list summary{padding:8px 0;color:var(--mf-green);cursor:pointer}
+  #maeumi-flow .mf-urgent{color:#8b3534;font-weight:700}
+  #maeumi-flow .mf-caution{color:#744815;font-weight:700}
+  @media(max-width:480px){
+    #maeumi-flow .mf-bar,#maeumi-flow .mf-route{padding-inline:12px}
+    #maeumi-flow .mf-stage,#maeumi-flow .mf-screen{padding:14px}
+    #maeumi-flow .mf-pair{grid-template-columns:minmax(0,1fr)}
+  }
+</style>
+<script>
+(() => {
+  const root = document.getElementById("maeumi-flow");
+  const find = selector => root.querySelector(selector);
+  const screens = [...root.querySelectorAll("[data-screen]")];
+  const steps = [...root.querySelectorAll("[data-show]")];
+  const greetings = [
+    "안녕하세요. 우리 학급 안내 챗봇입니다. 학급 일정이나 준비물이 궁금하시면 문의해 주세요.",
+    "우리 학급 안내입니다. 궁금한 내용을 입력해 주세요.",
+    "안녕하세요, 학부모님. 학급 생활에 관해 궁금한 점을 남겨 주세요. 선생님의 확인이 필요한 문의는 전달해 드릴게요."
+  ];
+  const tones = [
+    "준비물은 물과 도시락입니다.",
+    "체험학습 준비물은 물과 도시락입니다.",
+    "체험학습에는 물과 도시락을 준비해 주세요.",
+    "체험학습 때 물과 도시락을 챙겨 주세요. 준비에 참고해 주세요.",
+    "체험학습 준비를 도와드릴게요. 물과 도시락을 챙겨 주세요."
+  ];
+  function show(name) {
+    steps.forEach(button => {
+      if (button.dataset.show === name) button.setAttribute("aria-current", "step");
+      else button.removeAttribute("aria-current");
+    });
+    screens.forEach(screen => { screen.hidden = screen.dataset.screen !== name; });
+    steps.find(button => button.dataset.show === name).focus();
+  }
+  steps.forEach(button => button.addEventListener("click", () => show(button.dataset.show)));
+  root.querySelectorAll("[data-next]").forEach(button => button.addEventListener("click", () => show(button.dataset.next)));
+  function onSubmit(name, handler) {
+    find('[data-action="' + name + '"]').addEventListener("submit", event => {
+      event.preventDefault();
+      handler(event.currentTarget);
+    });
+  }
+  function reveal(button, target) {
+    find(button).addEventListener("click", event => {
+      const revealed = find(target);
+      revealed.hidden = false;
+      const nextControl = revealed.querySelector("input, button");
+      if (nextControl) nextControl.focus();
+      event.currentTarget.hidden = true;
+    });
+  }
+  onSubmit("email", form => {
+    const codeForm = find('[data-action="login"]');
+    codeForm.hidden = false;
+    codeForm.elements.code.focus();
+    form.hidden = true;
+  });
+  onSubmit("login", () => show("verify"));
+  reveal("[data-apply]", "[data-review]");
+  onSubmit("class", () => {
+    const end = find("#mf-end");
+    if (end.value < find("#mf-start").value) {
+      end.setCustomValidity("종료일을 시작일 이후로 선택하세요.");
+      end.reportValidity();
+      return;
+    }
+    root.querySelectorAll("[data-classname]").forEach(label => {
+      label.textContent = find("#mf-classname").value;
+    });
+    find("#mf-contact-summary").textContent = find("#mf-contact-input").value;
+    show("chat");
+  });
+  ["#mf-start", "#mf-end"].forEach(selector => {
+    find(selector).addEventListener("input", () => find("#mf-end").setCustomValidity(""));
+  });
+  find("#mf-template").addEventListener("change", event => {
+    find("#mf-greeting").value = greetings[Number(event.target.value)];
+  });
+  find("#mf-tone").addEventListener("change", event => {
+    find("#mf-tone-example").textContent = tones[Number(event.target.value)];
+  });
+  find("[data-upload]").addEventListener("click", event => {
+    find("#mf-file-status").textContent = "등록 완료 · 답변에 사용 가능";
+    find("[data-answer]").hidden = false;
+    event.currentTarget.disabled = true;
+  });
+  reveal("[data-publish]", "[data-shared]");
+  reveal("[data-parent-login]", '[data-action="parent"]');
+  onSubmit("parent", form => {
+    const code = form.elements.classcode;
+    if (code.value.trim().toUpperCase() !== "MAEUM32") {
+      code.setCustomValidity("예시 학급 코드 MAEUM32를 입력해 주세요.");
+      code.reportValidity();
+      return;
+    }
+    find("#mf-parent-greeting").textContent = find("#mf-greeting").value || greetings[0];
+    find("[data-parent-chat]").hidden = false;
+    form.hidden = true;
+  });
+  find('[name="classcode"]').addEventListener("input", event => event.target.setCustomValidity(""));
+})();
+</script>
+
+<script src="prototype.js" defer></script></body></html>
