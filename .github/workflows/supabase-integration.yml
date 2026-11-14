@@ -1,0 +1,31 @@
+name: Supabase integration
+on:
+  push:
+    branches: [codex/maeumi-first-version]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  supabase:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx --yes supabase@3.1.0 start -x studio,imgproxy,postgres-meta,realtime,edge-runtime,logflare,vector,supavisor
+      - name: Verify local Auth and migrated database
+        shell: bash
+        run: |
+          npx --yes supabase@3.1.0 status -o env > "$RUNNER_TEMP/supabase.env"
+          set -a
+          source "$RUNNER_TEMP/supabase.env"
+          set +a
+          export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+          export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="$PUBLISHABLE_KEY"
+          npm run check:supabase
+          npm run test:db
+          npm run build
