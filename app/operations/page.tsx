@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { verificationContext } from "../../lib/verification";
 import { reviewCertificate, retryCertificateDeletion } from "./actions";
 
 export default async function OperationsPage({ searchParams }: { searchParams: Promise<{ result?: string }> }) {
+  await connection();
   const context = await verificationContext();
   if (!context?.operator) redirect("/account");
   const { result } = await searchParams;
