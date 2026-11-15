@@ -5,7 +5,16 @@ export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   let response = NextResponse.next({ request });
-  if (!url || !key) return response;
+  const path = request.nextUrl.pathname;
+  const requiresLogin = path === "/account" || path.startsWith("/account/") ||
+    path === "/operations" || path.startsWith("/operations/");
+  const login = () => {
+    const redirect = NextResponse.redirect(new URL("/login", request.url));
+    for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
+    redirect.headers.set("Cache-Control", "private, no-store");
+    return redirect;
+  };
+  if (!url || !key) return requiresLogin ? login() : response;
 
   const client = createServerClient(url, key, {
     cookies: {
@@ -20,7 +29,8 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  await client.auth.getClaims();
+  const { data } = await client.auth.getClaims();
+  if (requiresLogin && !data?.claims?.sub) return login();
   response.headers.set("Cache-Control", "private, no-store");
   return response;
 }
