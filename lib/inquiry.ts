@@ -46,7 +46,13 @@ export async function classifyInquiry(message: string, sources: Source[]) {
         text: { format: { type: "json_schema", name: "inquiry", strict: true, schema } },
       }),
     });
-    if (!response.ok) return null;
+    if (!response.ok) {
+      const failure = await response.json().catch(() => null);
+      const code = failure?.error?.code;
+      const safeCode = typeof code === "string" && /^[a-z_]{1,64}$/.test(code) ? code : undefined;
+      console.warn("Inquiry model request failed", { status: response.status, code: safeCode });
+      return null;
+    }
     const result = await response.json();
     const output = result.output?.flatMap((item: { content?: { type: string; text?: string }[] }) =>
       item.content ?? []).find((item: { type: string }) => item.type === "output_text");

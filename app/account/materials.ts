@@ -29,7 +29,8 @@ export async function uploadMaterial(form: FormData) {
     } finally {
       await parser.destroy();
     }
-  } catch {
+  } catch (error) {
+    console.error("PDF text extraction failed", error instanceof Error ? error.name : "UnknownError");
     redirect("/account?result=material-invalid");
   }
   if (!pages.length) redirect("/account?result=material-invalid");
