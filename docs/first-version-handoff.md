@@ -13,7 +13,7 @@
 
 | Phase | 상태 | 근거와 남은 검수 |
 | --- | --- | --- |
-| 0 배포 기반 | 외부 확인 필요 | Next.js 빌드, GitHub 연동, Vercel Preview 배포 체크와 개발용 Auth API 검사를 통과했다. Vercel Preview 배포는 생성된다. Preview 환경에는 개발용 Supabase 변수가 없어 별도 개발 프로젝트를 연결한 뒤 앱의 Auth와 DB 연결을 확인해야 한다. |
+| 0 배포 기반 | 외부 확인 필요 | Next.js 빌드, GitHub 연동, Vercel Preview 배포 체크와 개발용 Auth API 검사를 통과했다. Vercel Preview에서 개발 Supabase Auth API와 학급 테이블 조회를 확인했다. 숫자 인증 메일의 전달을 확인했으며, 코드 입력 후 내 계정 화면 검수가 남았다. |
 | 1 인증·권한 | 진행 중 | 격리된 브라우저에서 세 역할의 OTP, 교원 반려·승인과 증명서 삭제, 비운영팀의 증명서 접근 차단을 확인했다. 운영 OTP도 확인했다. |
 | 2 학급·입장 | 진행 중 | 가상 학급 개설, 코드 입장과 고유 입장 인원 확인을 브라우저에서 검증했다. 코드 회전과 기간 제한은 DB 테스트에서 확인했다. Preview 검수가 남았다. |
 | 3 PDF·AI | 진행 중 | PDF 등록과 출처 표시를 가상 모델 응답으로 검증했다. 실제 API 분류는 개발용 모델로 별도 확인했다. 운영 출처 답변을 확인했다. 서버 검증은 가상 모델 응답에서 미등록 출처 ID, 다른 학급의 출처 ID, 원문에 없는 인용, PDF 지시문 인용을 거절했다. |
@@ -47,5 +47,5 @@
 
 - [운영 배포 d5c780f](https://vercel.com/ai-heart/ai_heart/HJhkmCwcECfXgf5VukXZNhgovf8H)는 Ready이며 운영 도메인에 연결됐다.
 - 별도 학부모 테스트 계정으로 이메일 OTP 로그인, 코드 입장, PDF 출처 답변, 가상 상담 문의 접수를 확인한다. 담당 교사 계정에서 받은함의 요약·긴급도·원문을 대조한다.
-- 별도 개발 Supabase에 마이그레이션을 적용한다. 개발 프로젝트 URL과 키를 Vercel Preview에 등록하고 Preview에서 테스트 계정으로 로그인해 개발 DB 연결을 확인한다.
+- [개발 Supabase](https://supabase.com/dashboard/project/lhxalfeobkmyooycpouc)에 마이그레이션 5개를 적용했다. [검수용 Preview 배포](https://vercel.com/ai-heart/ai_heart/3dvJVy4qzYa3LhA1wHK3X55A9TJ9)에서 개발 Auth API와 학급 테이블 조회가 성공했다. 개발용 Resend에서 숫자 인증 메일 전달을 확인했다. 수신자가 Preview에 코드를 입력한 뒤 내 계정 화면을 확인한다.
 - 팀은 참여 교사, 예시 질문, 후기 수집 방법을 정한다. 실제 문의 접수 여부는 교사 테스트 결과를 보고 결정한다.
