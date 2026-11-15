@@ -16,6 +16,9 @@ export async function login(state: LoginState, form: FormData): Promise<LoginSta
 
   if (state.email !== email) {
     const { error } = await client.auth.signInWithOtp({ email });
+    if (error?.status === 429) {
+      return { error: "인증 코드를 너무 자주 요청했습니다. 잠시 기다렸다가 다시 시도해 주세요." };
+    }
     return error ? { error: "인증 코드 발송에 실패했습니다. 잠시 후 다시 시도해 주세요." } : { email };
   }
 

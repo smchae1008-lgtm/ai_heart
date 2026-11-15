@@ -2,7 +2,6 @@
 
 import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
-import { PDFParse } from "pdf-parse";
 import { verificationContext, maxCertificateBytes } from "../../lib/verification";
 
 export async function uploadMaterial(form: FormData) {
@@ -19,6 +18,7 @@ export async function uploadMaterial(form: FormData) {
   const bytes = new Uint8Array(await file.arrayBuffer());
   let pages: { number: number; text: string }[];
   try {
+    const { PDFParse } = await import("pdf-parse");
     const parser = new PDFParse({ data: bytes.slice() });
     try {
       const extracted = await parser.getText({ first: 40 });
