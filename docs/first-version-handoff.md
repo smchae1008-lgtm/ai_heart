@@ -7,7 +7,7 @@
 - [GitHub Actions 브라우저 검수](https://github.com/smchae1008-lgtm/ai_heart/actions/runs/43612968039)에서 격리된 Supabase를 시작하고 가상 계정 3개의 OTP 로그인, 증명서 반려·재신청·승인·삭제, 학급 개설, 코드 입장과 인원 수, PDF 업로드, 교사의 문의 원문 열람, 학부모의 원문 접근 차단, 학급 삭제에 따른 Storage와 DB 정리를 검증했다. PDF 근거 답변은 가상 모델 응답으로 검증했다.
 - `npm run test:db`로 마이그레이션, RLS, 학급 코드 재발급, 문의 중복 방지, 경고 후 대화 종료와 상담 시간에 따른 알림을 확인했다. 같은 CI에서 Auth API 연결과 Next.js 빌드도 통과했다.
 - 별도 OpenAI 개발 호출에서 `gpt-6-luna`로 일정 원문 인용, 근거 부족 시 일반민원, 안전 문의 긴급도 상, 개인번호 요구의 악성민원, 악성민원과 긴급도 상의 동시 분류를 확인했다. 기존 기본 모델 `gpt-5.6-luna`는 사용한 개발 키에서 잔액 부족 오류를 반환했다.
-- [PR #1](https://github.com/smchae1008-lgtm/ai_heart/pull/1)은 초안이다. 운영 Supabase에 신규 테이블이 아직 없고 Vercel 팀 API는 접근 권한 오류를 반환했다. 운영 적용과 운영 Ready 검증이 남아 있다.
+- [PR #1](https://github.com/smchae1008-lgtm/ai_heart/pull/1)은 초안이다. 운영 Supabase에 마이그레이션 5개를 적용했다. 적용 이력과 신규 테이블 5개의 RLS 활성화를 확인했다. Vercel 팀 API 접근 및 운영 Ready 검증이 남아 있다.
 
 ## Phase별 검수 현황
 
