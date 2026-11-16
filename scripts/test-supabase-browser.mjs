@@ -158,7 +158,7 @@ try {
   const parent = await login(browser, "parent@example.com", "/join", true);
   await parent.getByLabel("학급 코드").fill("00000000-0000-4000-8000-000000000001");
   await parent.getByRole("button", { name: "입장", exact: true }).click();
-  await parent.getByRole("alert").waitFor();
+  await parent.getByText("이 코드로 입장할 수 없어요.", { exact: false }).waitFor();
   await parent.getByLabel("학급 코드").fill(code);
   assert.equal(await parent.getByLabel("학급 코드").inputValue(), code);
   await parent.getByRole("button", { name: "입장", exact: true }).click();
@@ -231,7 +231,7 @@ try {
   await parent.goto(origin + "/join");
   await parent.getByLabel("학급 코드").fill(privateCode);
   await parent.getByRole("button", { name: "입장", exact: true }).click();
-  await parent.getByRole("alert").waitFor();
+  await parent.getByText("이 코드로 입장할 수 없어요.", { exact: false }).waitFor();
   assert.equal(new URL(parent.url()).pathname, "/join");
   console.log("PASS: browser OTP, certificate review and deletion, class admission, teacher inbox, PDF upload and classroom deletion");
 } finally {
