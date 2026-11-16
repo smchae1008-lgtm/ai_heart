@@ -140,6 +140,10 @@ try {
   await teacher.getByRole("button", { name: "학급 개설", exact: true }).click();
   await teacher.getByRole("heading", { name: "가상 학급" }).waitFor();
   const code = await teacher.locator("code").innerText();
+  await teacher.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+  await teacher.getByRole("button", { name: "코드 복사" }).click();
+  await teacher.getByText("학급 코드를 복사했어요.").waitFor();
+  assert.equal(await teacher.evaluate(() => navigator.clipboard.readText()), code);
   const { id: classId } = result(await admin.from("classrooms").select("id").eq("join_code", code).single());
   const path = "/class/" + classId;
   await teacher.getByText("학사일정 PDF", { exact: true }).first().click();

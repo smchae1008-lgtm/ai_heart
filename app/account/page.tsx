@@ -7,6 +7,7 @@ import { ClassForm, type Classroom } from "./class-form";
 import { deleteClass, rotateCode } from "./classes";
 import { uploadMaterial } from "./materials";
 import { Inbox } from "./inbox";
+import { ClassCode } from "./class-code";
 import { verificationContext } from "../../lib/verification";
 
 export default async function AccountPage({ searchParams }: { searchParams: Promise<{ result?: string }> }) {
@@ -90,7 +91,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           {!classroom.deleting && <p>{classroom.published
             ? "학부모에게 아래 학급 코드를 전달해 주세요."
             : "학부모 입장 비공개 · 학급 설정에서 공식 문의처를 입력하고 학부모 입장을 허용해 주세요."}</p>}
-          <p className="dashboard-class-code">학급 코드 <code>{classroom.join_code}</code></p>
+          <ClassCode key={classroom.join_code} code={classroom.join_code} />
           {!classroom.deleting && <><form action={rotateCode}>
             <input type="hidden" name="id" value={classroom.id} />
             <button>코드 재발급</button>
