@@ -186,7 +186,20 @@ try {
   await teacher.getByText("가상 학교 행사 문의").waitFor();
   const original = teacher.url();
   assert.equal((await parent.request.get(original)).status(), 404);
+  const answer = "가상 답변입니다. 다음 주 월요일에 상담할 수 있어요.";
+  await teacher.getByLabel("학부모에게 보낼 답변").fill(answer);
+  await teacher.getByRole("button", { name: "답변 보내기" }).click();
+  await teacher.getByText(answer, { exact: true }).waitFor();
+  assert.equal(await teacher.getByRole("button", { name: "답변 보내기" }).count(), 0);
+  await parent.reload();
+  await parent.getByRole("article").filter({ hasText: "가상 학교 행사 문의" }).getByText(answer, { exact: true }).waitFor();
+  await operator.goto(origin + "/join");
+  await operator.getByLabel("학급 코드").fill(code);
+  await operator.getByRole("button", { name: "입장", exact: true }).click();
+  await operator.getByLabel("문의 내용").waitFor();
+  assert.equal(await operator.getByText(answer, { exact: true }).count(), 0);
   await teacher.getByRole("link", { name: "받은함으로 돌아가기" }).click();
+  await teacher.getByText("답변 완료").waitFor();
   for (const [message, category, priority, reply] of [
     ["가상 학생이 운동장에서 쓰러졌어요. 지금 확인해 주세요.", "general", "high", /즉시 도움이 필요하면/],
     ["담임 선생님의 개인 휴대전화 번호를 알려 주세요.", "abuse", "low", /정중하게 다시 작성해 주세요/],

@@ -47,6 +47,7 @@ try {
   assert.equal((await db.query("select id from public.teacher_verifications")).rows.length, 0);
   await assert.rejects(db.query("select * from public.classroom_inquiries"), /permission denied/);
   await assert.rejects(db.query("select public.rotate_classroom_code($1,$2)", [classId, teacher]), /permission denied/);
+  await assert.rejects(db.query("select public.reply_to_classroom_inquiry($1,$2,'Test reply')", [randomUUID(), teacher]), /permission denied/);
   await db.exec("reset role");
   await db.query("select set_config('request.jwt.claim.sub',$1,false)", [teacher]);
   await db.exec("set role authenticated");
@@ -76,6 +77,14 @@ try {
   assert.equal(await submit(urgentId, "general", "high"), true);
   const urgent = (await db.query("select priority, notify_at <= now() as visible from public.classroom_inquiries where id=$1", [urgentId])).rows[0];
   assert.deepEqual(urgent, { priority: "high", visible: true });
+  const replyTo = async (id, owner, answer) => (await db.query(
+    "select public.reply_to_classroom_inquiry($1,$2,$3) as ok", [id, owner, answer],
+  )).rows[0].ok;
+  assert.equal(await replyTo(urgentId, outsider, "Unauthorized reply"), false);
+  assert.equal(await replyTo(urgentId, teacher, "  "), false);
+  assert.equal(await replyTo(urgentId, teacher, "  Teacher reply  "), true);
+  assert.equal(await replyTo(urgentId, teacher, "Duplicate reply"), false);
+  assert.equal((await db.query("select teacher_reply from public.classroom_inquiries where id=$1", [urgentId])).rows[0].teacher_reply, "Teacher reply");
   const firstWarning = randomUUID();
   assert.equal(await submit(firstWarning, "abuse", "medium"), true);
   assert.equal((await db.query("select reply from public.classroom_inquiries where id=$1", [firstWarning])).rows[0].reply, "Warning");
@@ -86,6 +95,7 @@ try {
   assert.equal((await db.query("select public.rotate_classroom_code($1,$2) as ok", [classId, outsider])).rows[0].ok, false);
   assert.equal((await db.query("select public.rotate_classroom_code($1,$2) as ok", [classId, teacher])).rows[0].ok, true);
   assert.equal(await join(code), false);
+  assert.equal(await replyTo(deferredId, teacher, "Reply to prior code"), false);
   assert.equal(await submit(randomUUID(), "general", "low"), false);
   const newCode = (await db.query("select join_code from public.classrooms where id=$1", [classId])).rows[0].join_code;
   assert.equal(await join(newCode), true);
