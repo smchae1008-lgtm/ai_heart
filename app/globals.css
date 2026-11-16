@@ -159,3 +159,76 @@ button:enabled { cursor: pointer; }
 button:enabled:hover { background: #1d4c3e; }
 button:disabled { opacity: .65; }
 [role="alert"] { color: #8b3534; }
+
+main.teacher-dashboard {
+  width: min(calc(100% - 32px), 920px);
+  padding: 0;
+  gap: 20px;
+  border: 0;
+  background: transparent;
+}
+
+.dashboard-header, .dashboard-class-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.dashboard-header { margin-bottom: 4px; }
+.dashboard-header p, .dashboard-class-header p {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+main.teacher-dashboard .dashboard-panel, .dashboard-create {
+  padding: clamp(16px, 4vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.teacher-dashboard .dashboard-panel h2 { margin: 0; }
+.teacher-dashboard details > summary {
+  min-height: 44px;
+  padding-block: 10px;
+  font-weight: 600;
+}
+
+.dashboard-create > summary { font-size: 17px; }
+.dashboard-create:not([open]) { padding-block: 6px; }
+.dashboard-class-code code {
+  display: inline-block;
+  margin-inline-start: 6px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--selected);
+  color: var(--green);
+}
+
+.dashboard-materials, .dashboard-alerts {
+  margin: 0 0 12px;
+  padding-inline-start: 20px;
+}
+
+.teacher-dashboard .dashboard-inbox { background: var(--canvas); }
+.dashboard-inbox h4 { margin: 0; font-size: 16px; }
+.teacher-dashboard .dashboard-inbox article { background: var(--surface); }
+.dashboard-alerts { margin-bottom: 0; color: #8b3534; }
+.dashboard-inquiry-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.dashboard-inquiry-meta span {
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #edf0ec;
+  color: #485850;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dashboard-inquiry-meta [data-category="abuse"] { background: #f6e9d1; color: #744815; }
+.dashboard-inquiry-meta [data-priority="high"] { background: #f8e9e7; color: #8b3534; }
+.dashboard-inquiry-meta [data-priority="medium"] { background: #f3eee1; color: #66501d; }
+.dashboard-inquiry-summary { white-space: pre-wrap; }
+.dashboard-inbox article a { justify-self: start; font-size: 14px; }

@@ -13,6 +13,15 @@ function result(response) {
   return response.data;
 }
 
+async function checkTeacherLayout(teacher, content) {
+  for (const width of [390, 1440]) {
+    await teacher.setViewportSize({ width, height: 900 });
+    await content.waitFor();
+    const overflow = await teacher.evaluate(() => document.documentElement.scrollWidth > innerWidth);
+    assert.equal(overflow, false, `Teacher dashboard fits a ${width}px viewport`);
+  }
+}
+
 async function login(browser, email, next = "/account") {
   const page = await browser.newPage();
   await page.goto(origin + "/login?next=" + encodeURIComponent(next));
@@ -94,6 +103,7 @@ try {
     await teacher.getByText(decision === "승인" ? "교원 인증이 승인됐습니다." : "반려 사유 가상 검수 사유").waitFor();
   }
   await teacher.getByText("새 학급 개설", { exact: true }).click();
+  await checkTeacherLayout(teacher, teacher.locator('[name=name]'));
   await teacher.locator('[name=name]').fill("가상 학급");
   await teacher.locator('[name=starts]').fill("2020-01-01");
   await teacher.locator('[name=ends]').fill("2099-12-31");
@@ -106,6 +116,7 @@ try {
   const code = await teacher.locator("code").innerText();
   const classId = path.split("/").at(-1);
   await teacher.getByText("학사일정 PDF", { exact: true }).first().click();
+  await checkTeacherLayout(teacher, teacher.getByRole("button", { name: "PDF 등록" }));
   await teacher.locator('[name=material]').setInputFiles({
     name: "schedule.pdf", mimeType: "application/pdf", buffer: syntheticSchedule(),
   });
@@ -129,6 +140,7 @@ try {
   await parent.getByText(/선생님께 문의를 전달했습니다/).waitFor();
   await teacher.reload();
   await teacher.getByText("현재 코드 입장 계정 1").waitFor();
+  await checkTeacherLayout(teacher, teacher.getByRole("link", { name: "문의 원문 보기" }));
   await teacher.getByRole("link", { name: "문의 원문 보기" }).click();
   await teacher.getByText("가상 학교 행사 문의").waitFor();
   const original = teacher.url();
