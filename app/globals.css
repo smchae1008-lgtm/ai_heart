@@ -273,3 +273,12 @@ main.teacher-dashboard .dashboard-panel, .dashboard-create {
 }
 
 .inquiry-submit { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+
+.teacher-dashboard [aria-invalid="true"] { border-color: #8b3534; }
+.class-field-error {
+  display: block;
+  margin-top: 4px;
+  color: #8b3534;
+  font-size: 13px;
+  font-weight: 400;
+}
