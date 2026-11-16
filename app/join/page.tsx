@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { verificationContext } from "../../lib/verification";
 import { joinClassByCode } from "../class/[id]/actions";
 
 export default async function JoinPage({ searchParams }: { searchParams: Promise<{ result?: string }> }) {
+  await connection();
   if (!await verificationContext()) redirect("/login?next=%2Fjoin");
   const { result } = await searchParams;
   return (
