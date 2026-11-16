@@ -113,9 +113,29 @@ try {
   await checkTeacherLayout(teacher, teacher.locator('[name=name]'));
   await teacher.locator('[name=name]').fill("가상 학급");
   await teacher.locator('[name=starts]').fill("2020-01-01");
-  await teacher.locator('[name=ends]').fill("2099-12-31");
-  await teacher.locator('[name=contact]').fill("가상 학교 행정실");
+  await teacher.locator('[name=ends]').fill("2019-12-31");
+  await teacher.locator('[name=start_1]').fill("09:00");
+  await teacher.locator('[name=template]').selectOption("2");
+  await teacher.locator('[name=greeting]').fill("가상 학급 안내입니다.");
+  await teacher.locator('[name=tone]').selectOption("4");
   await teacher.locator('[name=published]').check();
+  await teacher.getByRole("button", { name: "학급 개설", exact: true }).click();
+  await teacher.getByText("종료일은 시작일과 같거나 이후여야 해요.").waitFor();
+  await teacher.getByText("종료 시간을 입력해 주세요.").waitFor();
+  await teacher.getByText("학부모 링크를 공개하려면 학교 공식 문의처를 입력해 주세요.").waitFor();
+  for (const [name, value] of Object.entries({
+    name: "가상 학급", starts: "2020-01-01", ends: "2019-12-31", start_1: "09:00",
+    template: "2", greeting: "가상 학급 안내입니다.", tone: "4",
+  })) {
+    assert.equal(await teacher.locator(`[name=${name}]`).inputValue(), value);
+  }
+  assert.ok(await teacher.locator('[name=published]').isChecked());
+  for (const name of ["ends", "end_1", "contact"]) {
+    assert.equal(await teacher.locator(`[name=${name}]`).getAttribute("aria-invalid"), "true");
+  }
+  await teacher.locator('[name=ends]').fill("2099-12-31");
+  await teacher.locator('[name=end_1]').fill("16:00");
+  await teacher.locator('[name=contact]').fill("가상 학교 행정실");
   await teacher.getByRole("button", { name: "학급 개설", exact: true }).click();
   const classLink = teacher.getByRole("link", { name: "학부모 링크 열기" });
   await classLink.waitFor();
