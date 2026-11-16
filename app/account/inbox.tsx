@@ -9,7 +9,7 @@ export async function Inbox({ classroomId }: { classroomId: string }) {
     .eq("id", classroomId).eq("teacher_id", context.user.id).maybeSingle();
   if (!owner) return null;
   const { data, error } = await context.admin.from("classroom_inquiries")
-    .select("id,category,priority,summary,notify_at")
+    .select("id,category,priority,summary,notify_at,teacher_reply")
     .eq("classroom_id", classroomId).neq("category", "simple").order("created_at", { ascending: false });
   const now = Date.now();
   const alerts = data?.filter(row => row.notify_at && Date.parse(row.notify_at) <= now);
@@ -25,6 +25,7 @@ export async function Inbox({ classroomId }: { classroomId: string }) {
       <div className="dashboard-inquiry-meta">
         <span data-category={row.category}>{row.category === "abuse" ? "악성민원 · 주의" : "일반민원"}</span>
         <span data-priority={row.priority}>긴급도 {priorities[row.priority as keyof typeof priorities]}</span>
+        {row.teacher_reply && <span>답변 완료</span>}
       </div>
       <p className="dashboard-inquiry-summary">{row.summary}</p>
       <a href={`/account/inquiry/${row.id}`}>문의 원문 보기</a>

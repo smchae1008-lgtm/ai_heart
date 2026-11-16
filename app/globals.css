@@ -278,6 +278,8 @@ main.teacher-dashboard .dashboard-panel, .dashboard-create {
 .inquiry-message strong { font-size: 13px; color: var(--green); }
 .inquiry-message p { margin-top: 4px; white-space: pre-wrap; }
 .inquiry-reply { background: var(--canvas); }
+.inquiry-teacher-reply { background: var(--surface); border: 1px solid var(--line); }
+.teacher-reply-text { white-space: pre-wrap; }
 .class-conversation #inquiry-hint, .inquiry-submit [role="status"] {
   color: var(--muted);
   font-size: 13px;

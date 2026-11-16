@@ -20,7 +20,7 @@ export default async function ParentClassPage({ params, searchParams }: {
   if (admission?.code_version === classroom.code_version) {
     const { result } = await searchParams;
     const { data: messages, error } = await context.admin.from("classroom_inquiries")
-      .select("id,message,reply,category,priority").eq("classroom_id", id).eq("parent_id", context.user.id)
+      .select("id,message,reply,teacher_reply,category,priority").eq("classroom_id", id).eq("parent_id", context.user.id)
       .eq("code_version", classroom.code_version).order("created_at", { ascending: false }).limit(50);
     const { count } = await context.admin.from("classroom_inquiries").select("id", { count: "exact", head: true })
       .eq("classroom_id", id).eq("parent_id", context.user.id).eq("code_version", classroom.code_version).eq("category", "abuse");
@@ -38,6 +38,10 @@ export default async function ParentClassPage({ params, searchParams }: {
           <strong>AI 마음이</strong>
           <p>{item.reply}</p>
         </div>
+        {item.teacher_reply && <div className="inquiry-message inquiry-teacher-reply">
+          <strong>선생님 답변</strong>
+          <p>{item.teacher_reply}</p>
+        </div>}
         {(item.category === "abuse" || item.priority === "high") && <p>학교 공식 문의처 · {classroom.official_contact}</p>}
       </article>)}
       {closed && <p>대화가 종료되었습니다. 학교 공식 문의처 · {classroom.official_contact}</p>}
