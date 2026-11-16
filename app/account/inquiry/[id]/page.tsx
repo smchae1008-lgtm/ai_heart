@@ -22,7 +22,7 @@ export default async function InquiryPage({ params }: { params: Promise<{ id: st
       <h2>선생님 답변</h2>
       {data.teacher_reply
         ? <p className="teacher-reply-text">{data.teacher_reply}</p>
-        : classroom?.data ? <ReplyForm inquiryId={id} />
+        : classroom?.data ? <ReplyForm inquiryId={id} classroomId={data.classroom_id} />
           : <p>운영 중이며 현재 코드로 입장한 학급의 문의에 답변을 보낼 수 있어요.</p>}
     </section>
     <a href="/account">받은함으로 돌아가기</a>

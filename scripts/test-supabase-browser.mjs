@@ -191,8 +191,15 @@ try {
   await teacher.getByRole("button", { name: "답변 보내기" }).click();
   await teacher.getByText(answer, { exact: true }).waitFor();
   assert.equal(await teacher.getByRole("button", { name: "답변 보내기" }).count(), 0);
-  await parent.reload();
-  await parent.getByRole("article").filter({ hasText: "가상 학교 행사 문의" }).getByText(answer, { exact: true }).waitFor();
+  const answered = result(await admin.from("classroom_inquiries").select("message,teacher_reply")
+    .eq("id", new URL(original).pathname.split("/").at(-1)).single());
+  assert.deepEqual(answered, { message: "가상 학교 행사 문의", teacher_reply: answer });
+  await parent.goto(origin + path);
+  const parentReply = parent.getByRole("article").filter({ hasText: "가상 학교 행사 문의" }).getByText(answer, { exact: true });
+  await parentReply.waitFor({ timeout: 10000 }).catch(async error => {
+    console.error("Parent reply verification", { pathname: new URL(parent.url()).pathname, content: await parent.locator("main").innerText() });
+    throw error;
+  });
   await operator.goto(origin + "/join");
   await operator.getByLabel("학급 코드").fill(code);
   await operator.getByRole("button", { name: "입장", exact: true }).click();

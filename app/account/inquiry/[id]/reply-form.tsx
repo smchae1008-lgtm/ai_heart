@@ -3,9 +3,9 @@
 import { useActionState, useState } from "react";
 import { replyToInquiry } from "./actions";
 
-export function ReplyForm({ inquiryId }: { inquiryId: string }) {
+export function ReplyForm({ inquiryId, classroomId }: { inquiryId: string; classroomId: string }) {
   const [state, action, pending] = useActionState<{ error?: string }, FormData>(
-    replyToInquiry.bind(null, inquiryId), {},
+    replyToInquiry.bind(null, inquiryId, classroomId), {},
   );
   const [answer, setAnswer] = useState("");
   return (

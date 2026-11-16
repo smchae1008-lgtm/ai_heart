@@ -1,9 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { verificationContext } from "../../../../lib/verification";
 
-export async function replyToInquiry(id: string, _previous: { error?: string }, form: FormData): Promise<{ error?: string }> {
+export async function replyToInquiry(id: string, classroomId: string, _previous: { error?: string }, form: FormData): Promise<{ error?: string }> {
   const context = await verificationContext();
   if (!context) redirect("/login");
   const value = form.get("answer");
@@ -13,5 +14,7 @@ export async function replyToInquiry(id: string, _previous: { error?: string }, 
     inquiry_id: id, owner_id: context.user.id, answer,
   });
   if (error || !data) return { error: "답변을 보내지 못했어요. 이미 답변했거나 학급 입장 상태가 바뀌었는지 확인해 주세요." };
+  revalidatePath("/class/" + classroomId);
+  revalidatePath("/account");
   redirect("/account/inquiry/" + id);
 }
