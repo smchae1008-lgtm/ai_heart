@@ -1,11 +1,161 @@
-body {
-  margin: 0;
-  background: #f5f2ea;
+:root {
+  color-scheme: light;
+  --canvas: #f5f2ea;
+  --surface: #fffefb;
+  --ink: #222d28;
+  --muted: #53635a;
+  --line: #d9ded4;
+  --green: #265d4d;
+  --selected: #e3eee7;
+  --header-height: 72px;
 }
 
-iframe {
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font: 15px/1.65 Pretendard, "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: -.035em;
+  word-break: keep-all;
+}
+
+h1 { font-size: clamp(26px, 4vw, 34px); }
+h2 { font-size: 22px; }
+h3 { font-size: 18px; }
+p { margin: 0; }
+a { color: var(--green); text-underline-offset: .2em; }
+:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+
+.home-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.home-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(100%, 1104px);
+  min-height: calc(var(--header-height) - 1px);
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 48px);
+}
+
+.home-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: clamp(16px, 3vw, 20px);
+}
+
+.home-header h1 span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--selected);
+  color: var(--green);
+}
+
+.home-header a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.home-header a:hover { background: var(--selected); }
+
+.home iframe {
   display: block;
   width: 100%;
-  height: 100dvh;
+  height: calc(100dvh - var(--header-height));
   border: 0;
 }
+
+main:not(.home) {
+  display: grid;
+  gap: 16px;
+  width: min(calc(100% - 32px), 760px);
+  margin: clamp(24px, 6vw, 64px) auto;
+  padding: clamp(20px, 5vw, 40px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+main:has(form input[autocomplete="email"]) { max-width: 480px; }
+main:not(.home) h2 { margin-top: 12px; }
+main:not(.home) :is(section, article) {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: clamp(12px, 3vw, 20px);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+main:not(.home) :is(form, fieldset) { display: grid; gap: 12px; min-width: 0; }
+main:not(.home) form p:has(> label + label) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr));
+  gap: 12px;
+}
+
+label { display: block; font-weight: 600; }
+fieldset { margin: 0; padding: 12px; border: 1px solid var(--line); border-radius: 10px; }
+legend { padding-inline: 4px; font-weight: 600; }
+summary { cursor: pointer; color: var(--green); padding-block: 8px; }
+details[open] > summary { margin-bottom: 8px; }
+details > :is(p, form) + :is(p, form) { margin-top: 10px; }
+
+button, input, select, textarea { font: inherit; }
+:is(input:not([type="hidden"], [type="checkbox"]), select, textarea) {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #abb8af;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 400;
+}
+
+label > :is(input:not([type="checkbox"]), select, textarea) { margin-top: 4px; }
+textarea { min-height: 88px; resize: vertical; }
+input[type="checkbox"] { accent-color: var(--green); }
+input[type="file"] { max-width: 100%; font-size: 13px; }
+
+button {
+  justify-self: start;
+  min-height: 44px;
+  padding: 8px 16px;
+  border: 1px solid var(--green);
+  border-radius: 10px;
+  background: var(--green);
+  color: var(--surface);
+  font-weight: 600;
+}
+
+button:enabled { cursor: pointer; }
+button:enabled:hover { background: #1d4c3e; }
+button:disabled { opacity: .65; }
+[role="alert"] { color: #8b3534; }
