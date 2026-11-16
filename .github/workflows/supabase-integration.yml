@@ -29,6 +29,7 @@ jobs:
           npm run build
 
           export SUPABASE_SECRET_KEY="$SECRET_KEY"
+          export TEACHER_PILOT_CODE=9084
           npm install --no-save --package-lock=false playwright@1.65.1
           npx playwright install --with-deps chromium
           OPENAI_API_KEY=synthetic-test NODE_OPTIONS="--import=./scripts/browser-model-fixture.mjs" npm run start -- --hostname 127.0.0.1 &

@@ -199,6 +199,24 @@ try {
   assert.ok((await materials.download(material.storage_path)).error);
   assert.equal(result(await admin.from("classroom_inquiries").select("id").eq("classroom_id", classId)).length, 0);
   assert.equal((await parent.request.get(origin + path)).status(), 404);
+  const pilot = await login(browser, "pilot-teacher@example.com");
+  await pilot.getByText("테스트 참여 코드 입력").click();
+  const pilotCode = pilot.locator('[name=pilot_code]');
+  await pilotCode.fill("0000");
+  await pilot.getByRole("button", { name: "테스트 참여 등록" }).click();
+  await pilot.getByText("테스트 참여 코드가 일치하지 않아요.").waitFor();
+  assert.equal(await pilot.getByText("새 학급 개설", { exact: true }).count(), 0);
+  await pilotCode.fill(process.env.TEACHER_PILOT_CODE);
+  await pilot.getByRole("button", { name: "테스트 참여 등록" }).click();
+  await pilot.getByText("테스트 참여가 등록됐습니다. 학급을 개설할 수 있어요.").waitFor();
+  assert.equal(await pilot.getByText("교원 인증이 승인됐습니다.").count(), 0);
+  assert.equal(await pilot.getByRole("link", { name: "교원 인증 검토" }).count(), 0);
+  await pilot.getByText("새 학급 개설", { exact: true }).click();
+  await pilot.locator('[name=name]').fill("가상 참여 학급");
+  await pilot.locator('[name=starts]').fill("2020-01-01");
+  await pilot.locator('[name=ends]').fill("2099-12-31");
+  await pilot.getByRole("button", { name: "학급 개설", exact: true }).click();
+  await pilot.getByRole("heading", { name: "가상 참여 학급" }).waitFor();
   console.log("PASS: browser OTP, certificate review and deletion, class admission, teacher inbox, PDF upload and classroom deletion");
 } finally {
   await browser.close();
