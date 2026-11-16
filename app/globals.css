@@ -224,6 +224,17 @@ main.teacher-dashboard .dashboard-panel, .dashboard-create {
 
 .dashboard-create > summary { font-size: 17px; }
 .dashboard-create:not([open]) { padding-block: 6px; }
+.dashboard-class-code {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
+}
+
+.dashboard-class-code button { font-size: 14px; }
+.dashboard-class-code [role="status"] { color: var(--muted); font-size: 13px; }
+.dashboard-class-code [role="status"]:empty { position: absolute; }
 .dashboard-class-code code {
   display: inline-block;
   margin-inline-start: 6px;
