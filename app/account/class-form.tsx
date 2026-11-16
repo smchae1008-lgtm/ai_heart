@@ -69,7 +69,7 @@ function ClassFields({ classroom, state }: { classroom?: Classroom; state: Class
         {["간결", "차분", "기본", "친절", "따뜻"].map((name, index) => <option key={name} value={index + 1}>{name}</option>)}
       </select>{error("tone")}</label></p>
       <p aria-live="polite">{previews[Number(tone) - 1]}</p>
-      <p><label><input type="checkbox" name="published" defaultChecked={values ? values.published === "on" : classroom?.published} /> 학부모 링크 공개</label></p>
+      <p><label><input type="checkbox" name="published" defaultChecked={values ? values.published === "on" : classroom?.published} /> 학부모 입장 허용</label></p>
     </>
   );
 }

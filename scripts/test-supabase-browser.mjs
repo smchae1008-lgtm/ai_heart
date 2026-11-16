@@ -27,8 +27,9 @@ async function login(browser, email, next = "/account", fromHome = false) {
   if (fromHome) {
     await page.goto(origin);
     assert.equal(await page.locator("iframe").count(), 0, "Service home does not embed the prototype");
-    await page.getByRole("link", { name: "대시보드 열기" }).click();
-    await page.waitForURL(origin + "/login");
+    const parentEntry = next === "/join";
+    await page.getByRole("link", { name: parentEntry ? "학급 코드로 입장" : "대시보드 열기" }).click();
+    await page.waitForURL(origin + (parentEntry ? "/login?next=%2Fjoin" : "/login"));
   } else {
     await page.goto(origin + "/login?next=" + encodeURIComponent(next));
   }
@@ -122,7 +123,7 @@ try {
   await teacher.getByRole("button", { name: "학급 개설", exact: true }).click();
   await teacher.getByText("종료일은 시작일과 같거나 이후여야 해요.").waitFor();
   await teacher.getByText("종료 시간을 입력해 주세요.").waitFor();
-  await teacher.getByText("학부모 링크를 공개하려면 학교 공식 문의처를 입력해 주세요.").waitFor();
+  await teacher.getByText("학부모 입장을 허용하려면 학교 공식 문의처를 입력해 주세요.").waitFor();
   for (const [name, value] of Object.entries({
     name: "가상 학급", starts: "2020-01-01", ends: "2019-12-31", start_1: "09:00",
     template: "2", greeting: "가상 학급 안내입니다.", tone: "4",
@@ -137,11 +138,10 @@ try {
   await teacher.locator('[name=end_1]').fill("16:00");
   await teacher.locator('[name=contact]').fill("가상 학교 행정실");
   await teacher.getByRole("button", { name: "학급 개설", exact: true }).click();
-  const classLink = teacher.getByRole("link", { name: "학부모 링크 열기" });
-  await classLink.waitFor();
-  const path = await classLink.getAttribute("href");
+  await teacher.getByRole("heading", { name: "가상 학급" }).waitFor();
   const code = await teacher.locator("code").innerText();
-  const classId = path.split("/").at(-1);
+  const { id: classId } = result(await admin.from("classrooms").select("id").eq("join_code", code).single());
+  const path = "/class/" + classId;
   await teacher.getByText("학사일정 PDF", { exact: true }).first().click();
   await checkTeacherLayout(teacher, teacher.getByRole("button", { name: "PDF 등록" }));
   await teacher.locator('[name=material]').setInputFiles({
@@ -155,9 +155,13 @@ try {
   assert.match(material.pages[0].text, /Field trip: November 24/);
   const materials = admin.storage.from("classroom-materials");
   assert.ok(result(await materials.download(material.storage_path)));
-  const parent = await login(browser, "parent@example.com", path);
+  const parent = await login(browser, "parent@example.com", "/join", true);
+  await parent.getByLabel("학급 코드").fill("00000000-0000-4000-8000-000000000001");
+  await parent.getByRole("button", { name: "입장", exact: true }).click();
+  await parent.getByRole("alert").waitFor();
   await parent.getByLabel("학급 코드").fill(code);
   await parent.getByRole("button", { name: "입장", exact: true }).click();
+  await parent.waitForURL(origin + path);
   await parent.getByLabel("문의 내용").fill("When is the field trip?");
   await parent.getByRole("button", { name: "문의 보내기" }).click();
   await parent.getByText(/Field trip: November 24/).waitFor();
@@ -217,6 +221,12 @@ try {
   await pilot.locator('[name=ends]').fill("2099-12-31");
   await pilot.getByRole("button", { name: "학급 개설", exact: true }).click();
   await pilot.getByRole("heading", { name: "가상 참여 학급" }).waitFor();
+  const privateCode = await pilot.locator("code").innerText();
+  await parent.goto(origin + "/join");
+  await parent.getByLabel("학급 코드").fill(privateCode);
+  await parent.getByRole("button", { name: "입장", exact: true }).click();
+  await parent.getByRole("alert").waitFor();
+  assert.equal(new URL(parent.url()).pathname, "/join");
   console.log("PASS: browser OTP, certificate review and deletion, class admission, teacher inbox, PDF upload and classroom deletion");
 } finally {
   await browser.close();

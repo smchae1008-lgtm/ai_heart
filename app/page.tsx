@@ -19,7 +19,8 @@ export default function HomePage() {
           </section>
           <section aria-labelledby="parent-entry">
             <h2 id="parent-entry">학부모</h2>
-            <p>담임 선생님에게 받은 학급 링크를 열어 주세요. 이메일 로그인 후 학급 코드를 입력하면 질문을 보낼 수 있어요.</p>
+            <p>이메일로 로그인하고 담임 선생님에게 받은 학급 코드를 입력하면 질문을 보낼 수 있어요.</p>
+            <a href="/join" className="service-action">학급 코드로 입장 <span aria-hidden="true">→</span></a>
           </section>
         </div>
       </div>
