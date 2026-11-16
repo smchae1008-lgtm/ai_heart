@@ -160,8 +160,14 @@ try {
   await parent.getByRole("button", { name: "입장", exact: true }).click();
   await parent.getByRole("alert").waitFor();
   await parent.getByLabel("학급 코드").fill(code);
+  assert.equal(await parent.getByLabel("학급 코드").inputValue(), code);
   await parent.getByRole("button", { name: "입장", exact: true }).click();
-  await parent.waitForURL(origin + path);
+  await parent.getByLabel("문의 내용").waitFor({ timeout: 10000 }).catch(async error => {
+    const { count } = await admin.from("classroom_admissions").select("parent_id", { count: "exact", head: true }).eq("classroom_id", classId);
+    console.error("Code entry verification", { pathname: new URL(parent.url()).pathname, admissions: count });
+    throw error;
+  });
+  assert.equal(new URL(parent.url()).pathname, path);
   await parent.getByLabel("문의 내용").fill("When is the field trip?");
   await parent.getByRole("button", { name: "문의 보내기" }).click();
   await parent.getByText(/Field trip: November 24/).waitFor();

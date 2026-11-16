@@ -16,14 +16,14 @@ async function admit(
   return Boolean(data && !error);
 }
 
-export async function joinClassByCode(form: FormData) {
+export async function joinClassByCode(_previous: { invalid?: boolean }, form: FormData) {
   const context = await verificationContext();
   if (!context) redirect("/login?next=%2Fjoin");
   const code = String(form.get("code") ?? "").trim();
-  if (!classroomUuid.test(code)) redirect("/join?result=invalid");
+  if (!classroomUuid.test(code)) return { invalid: true };
   const { data: classroom } = await context.admin.from("classrooms")
     .select("id").eq("join_code", code).eq("published", true).maybeSingle();
-  if (!classroom || !await admit(context, classroom.id, code)) redirect("/join?result=invalid");
+  if (!classroom || !await admit(context, classroom.id, code)) return { invalid: true };
   redirect("/class/" + classroom.id);
 }
 
