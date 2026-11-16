@@ -39,7 +39,8 @@ function ClassFields({ classroom, state }: { classroom?: Classroom; state: Class
   const id = useId();
   const values = state.values;
   const [greeting, setGreeting] = useState(values?.greeting ?? classroom?.greeting ?? greetings[0]);
-  const [tone, setTone] = useState(values?.tone ?? String(classroom?.tone ?? 3));
+  const initialTone = values?.tone ?? String(classroom?.tone ?? 3);
+  const [tone, setTone] = useState(initialTone);
   const invalid = (name: string) => state.errors?.[name] ? {
     "aria-invalid": true as const,
     "aria-describedby": id + "-" + name,
@@ -64,7 +65,7 @@ function ClassFields({ classroom, state }: { classroom?: Classroom; state: Class
         if (event.target.value) setGreeting(greetings[Number(event.target.value) - 1]);
       }}><option value="">문구 선택</option><option value="1">기본형</option><option value="2">간결형</option><option value="3">환영형</option></select></label></p>
       <p><label>첫인사 <textarea name="greeting" value={greeting} onChange={event => setGreeting(event.target.value)} maxLength={1000} required {...invalid("greeting")} />{error("greeting")}</label></p>
-      <p><label>말투 <select name="tone" value={tone} onChange={event => setTone(event.target.value)} {...invalid("tone")}>
+      <p><label>말투 <select name="tone" defaultValue={initialTone} onChange={event => setTone(event.target.value)} {...invalid("tone")}>
         {["간결", "차분", "기본", "친절", "따뜻"].map((name, index) => <option key={name} value={index + 1}>{name}</option>)}
       </select>{error("tone")}</label></p>
       <p aria-live="polite">{previews[Number(tone) - 1]}</p>
