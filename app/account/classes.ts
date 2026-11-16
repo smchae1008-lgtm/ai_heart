@@ -1,6 +1,6 @@
 "use server";
 import { redirect } from "next/navigation";
-import { schoolYear, verificationContext } from "../../lib/verification";
+import { hasTeacherPilotAccess, schoolYear, verificationContext } from "../../lib/verification";
 
 export type ClassFormState = {
   attempt: number;
@@ -56,7 +56,7 @@ export async function saveClass(previous: ClassFormState, form: FormData): Promi
   if (!Number.isInteger(record.tone) || record.tone < 1 || record.tone > 5) errors.tone = "말투를 선택해 주세요.";
   if (Object.keys(errors).length) return failure();
   const table = context.admin.from("classrooms");
-  if (!id) {
+  if (!id && !hasTeacherPilotAccess(context.user.app_metadata)) {
     const { data, error } = await context.admin.from("teacher_verifications").select("id")
       .eq("teacher_id", context.user.id).eq("school_year", schoolYear()).eq("status", "approved").maybeSingle();
     if (error || !data) return failure("이번 학년도 교원 인증을 확인할 수 없습니다. 승인 상태를 확인해 주세요.");

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createSupabaseClient } from "../../lib/supabase/server";
-import { schoolYear } from "../../lib/verification";
-import { submitCertificate } from "./actions";
+import { hasTeacherPilotAccess, schoolYear, teacherPilotCode } from "../../lib/verification";
+import { redeemTeacherPilotCode, submitCertificate } from "./actions";
 import { ClassForm, type Classroom } from "./class-form";
 import { deleteClass, rotateCode } from "./classes";
 import { uploadMaterial } from "./materials";
@@ -22,6 +22,9 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
     .eq("school_year", year).order("created_at", { ascending: false }).limit(1).maybeSingle();
   const canApply = !error && (!verification || verification.status === "rejected");
   const context = await verificationContext();
+  const pilotAccess = context && hasTeacherPilotAccess(context.user.app_metadata, year);
+  const approved = verification?.status === "approved";
+  const canUsePilotCode = Boolean(context?.user.email_confirmed_at && teacherPilotCode() && !pilotAccess && !approved);
   const classes = context && await context.admin.from("classrooms").select("*")
     .eq("teacher_id", account.sub).order("created_at", { ascending: false });
   const classrooms = await Promise.all((classes?.data ?? []).map(async row => {
@@ -45,6 +48,8 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         <h2>{year}학년도 교원 인증</h2>
         {error && <p role="alert">인증 상태를 불러오지 못했습니다.</p>}
         {submission && <p role="alert">{submission === "delete-confirm" ? "학급 기록 삭제에 동의해 주세요."
+          : submission === "pilot-invalid" ? "테스트 참여 코드가 일치하지 않아요."
+          : submission === "pilot-unavailable" ? "테스트 참여를 등록하지 못했어요. 잠시 후 다시 시도해 주세요."
           : submission === "delete-failed" ? "학급 삭제를 시작하지 못했습니다."
           : submission === "delete-retry" ? "새 문의는 차단됐습니다. 남은 학급 기록 삭제를 다시 시도해 주세요."
           : submission === "class-denied" ? "이번 학년도 교원 인증을 먼저 승인받아 주세요."
@@ -57,14 +62,22 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         {verification?.status === "pending" && <p>운영팀 검토 중입니다.</p>}
         {verification?.status === "approved" && <p>교원 인증이 승인됐습니다.</p>}
         {verification?.status === "rejected" && <p>반려 사유 {verification.rejection_reason}</p>}
-        {canApply && <form action={submitCertificate}>
+        {pilotAccess && !approved && <p>테스트 참여가 등록됐습니다. 학급을 개설할 수 있어요.</p>}
+        {canUsePilotCode && <details open={submission?.startsWith("pilot-") || undefined}>
+          <summary>테스트 참여 코드 입력</summary>
+          <form action={redeemTeacherPilotCode}>
+            <label>테스트 참여 코드 <input name="pilot_code" type="password" inputMode="numeric" pattern="[0-9]{4}" maxLength={4} required /></label>
+            <button>테스트 참여 등록</button>
+          </form>
+        </details>}
+        {canApply && !pilotAccess && <form action={submitCertificate}>
           <label>교원증명서 <input name="certificate" type="file" accept="application/pdf" required /></label>
           <button>{verification ? "다시 신청" : "인증 신청"}</button>
         </form>}
       </section>
       <h2>내 학급</h2>
       {classes?.error && <p role="alert">학급을 불러오지 못했습니다.</p>}
-      {context && verification?.status === "approved" && <details className="dashboard-create"><summary>새 학급 개설</summary><ClassForm /></details>}
+      {context && (approved || pilotAccess) && <details className="dashboard-create"><summary>새 학급 개설</summary><ClassForm /></details>}
       {classrooms.map(({ classroom, count, materials }) => (
         <section key={classroom.id} className="dashboard-panel">
           <header className="dashboard-class-header">

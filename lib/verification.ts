@@ -12,6 +12,15 @@ export function schoolYear(date = new Date()) {
   return month < 3 ? year - 1 : year;
 }
 
+export function teacherPilotCode() {
+  const code = process.env.TEACHER_PILOT_CODE;
+  return code && /^[0-9]{4}$/.test(code) ? code : undefined;
+}
+
+export function hasTeacherPilotAccess(metadata: Record<string, unknown>, year = schoolYear()) {
+  return Boolean(teacherPilotCode()) && metadata.maeumi_teacher_pilot_year === year;
+}
+
 export async function verificationContext() {
   const client = await createSupabaseClient();
   const result = await client?.auth.getUser();
