@@ -7,7 +7,6 @@
   --line: #d9ded4;
   --green: #265d4d;
   --selected: #e3eee7;
-  --header-height: 72px;
 }
 
 * { box-sizing: border-box; }
@@ -45,19 +44,20 @@ a { color: var(--green); text-underline-offset: .2em; }
   justify-content: space-between;
   gap: 12px;
   width: min(100%, 1104px);
-  min-height: calc(var(--header-height) - 1px);
+  min-height: 71px;
   margin-inline: auto;
   padding-inline: clamp(16px, 4vw, 48px);
 }
 
-.home-header h1 {
+.home-brand {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: clamp(16px, 3vw, 20px);
+  font-weight: 700;
 }
 
-.home-header h1 span {
+.home-brand span {
   display: grid;
   place-items: center;
   width: 32px;
@@ -67,26 +67,51 @@ a { color: var(--green); text-underline-offset: .2em; }
   color: var(--green);
 }
 
-.home-header a {
+.service-home {
+  width: min(100%, 1104px);
+  margin-inline: auto;
+  padding: clamp(32px, 7vw, 88px) clamp(16px, 4vw, 48px);
+}
+
+.service-intro { display: grid; gap: 12px; max-width: 520px; }
+.service-intro h1 { font-size: clamp(30px, 5vw, 48px); }
+.service-home p { color: var(--muted); word-break: keep-all; }
+.service-entry {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: clamp(24px, 4vw, 40px);
+}
+
+.service-entry section {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: clamp(20px, 4vw, 32px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.service-action {
   display: inline-flex;
   align-items: center;
+  justify-self: start;
   gap: 8px;
   min-height: 44px;
   padding: 6px 12px;
-  border: 1px solid var(--line);
+  margin-top: 4px;
   border-radius: 10px;
-  font-size: 13px;
+  background: var(--green);
+  color: var(--surface);
   font-weight: 700;
   text-decoration: none;
 }
 
-.home-header a:hover { background: var(--selected); }
+.service-action:hover { background: #1d4c3e; }
 
-.home iframe {
-  display: block;
-  width: 100%;
-  height: calc(100dvh - var(--header-height));
-  border: 0;
+@media (max-width: 560px) {
+  .service-entry { grid-template-columns: minmax(0, 1fr); }
 }
 
 main:not(.home) {

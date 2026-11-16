@@ -22,9 +22,16 @@ async function checkTeacherLayout(teacher, content) {
   }
 }
 
-async function login(browser, email, next = "/account") {
+async function login(browser, email, next = "/account", fromHome = false) {
   const page = await browser.newPage();
-  await page.goto(origin + "/login?next=" + encodeURIComponent(next));
+  if (fromHome) {
+    await page.goto(origin);
+    assert.equal(await page.locator("iframe").count(), 0, "Service home does not embed the prototype");
+    await page.getByRole("link", { name: "대시보드 열기" }).click();
+    await page.waitForURL(origin + "/login");
+  } else {
+    await page.goto(origin + "/login?next=" + encodeURIComponent(next));
+  }
   await page.locator('[name=email]').fill(email);
   await page.getByRole("button", { name: "인증 코드 받기" }).click();
   await page.locator('[name=token]').waitFor({ timeout: 15000 });
@@ -73,7 +80,7 @@ result(await admin.auth.admin.createUser({
 
 const browser = await chromium.launch();
 try {
-  const teacher = await login(browser, "teacher@example.com");
+  const teacher = await login(browser, "teacher@example.com", "/account", true);
   const operator = await login(browser, operatorEmail);
   assert.equal(await teacher.getByText("새 학급 개설", { exact: true }).count(), 0);
   await teacher.goto(origin + "/operations");

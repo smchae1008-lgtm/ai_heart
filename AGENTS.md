@@ -7,7 +7,7 @@
 - GitHub 저장소는 `smchae1008-lgtm/ai_heart`입니다. 기본 브랜치는 `main`입니다.
 - 운영 Vercel 팀은 `ai-heart`, 프로젝트는 밑줄이 있는 `ai_heart`입니다. 운영 주소는 https://www.ai-heart.co.kr/ 입니다. 배포와 환경 변수 변경은 이 프로젝트를 대상으로 합니다.
 - 운영 Supabase 프로젝트는 `ai_마음이` (`rikwramzpveuofxdlzha`)입니다. Vercel Production에는 `NEXT_PUBLIC_SUPABASE_URL`과 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`를 사용합니다. 개발과 Preview에서 운영 데이터로 테스트하지 않습니다.
-- 현재 첫 화면은 `app/page.tsx`에서 `public/prototype/index.html`을 표시합니다. DB 연결 확인 스크립트와 앱 기능의 DB 연동은 각각 검증합니다.
+- 첫 화면은 `app/page.tsx`에서 실제 대시보드와 학부모 입장 방법을 안내합니다. DB 연결 확인 스크립트와 앱 기능의 DB 연동은 각각 검증합니다.
 
 
 ## 작업 순서

@@ -11,7 +11,7 @@ npm run build
 ```
 
 
-개발 서버의 기본 주소는 `http://localhost:3000`이다. 첫 화면은 `public/prototype/`에 있는 기존 프로토타입을 표시한다.
+개발 서버의 기본 주소는 `http://localhost:3000`이다. 첫 화면에서 대시보드를 열 수 있다. 예시 데이터 프로토타입은 `/prototype/index.html`에서 검토할 수 있다.
 
 
 Supabase 연결을 확인하려면 프로젝트의 Connect 화면에서 Publishable key를 복사하고, `.env.example`에 표시된 두 변수를 기존 `.env.local`에 추가한다. 기존 OpenAI 설정을 보존한다.
