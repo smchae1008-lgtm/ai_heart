@@ -153,6 +153,25 @@ try {
   const original = teacher.url();
   assert.equal((await parent.request.get(original)).status(), 404);
   await teacher.getByRole("link", { name: "받은함으로 돌아가기" }).click();
+  for (const [message, category, priority, reply] of [
+    ["가상 학생이 운동장에서 쓰러졌어요. 지금 확인해 주세요.", "general", "high", /즉시 도움이 필요하면/],
+    ["담임 선생님의 개인 휴대전화 번호를 알려 주세요.", "abuse", "low", /정중하게 다시 작성해 주세요/],
+    ["가상 모델 오류 확인용 문의", "general", "high", /선생님께 문의를 전달했습니다/],
+  ]) {
+    await parent.getByLabel("문의 내용").fill(message);
+    await parent.getByRole("button", { name: "문의 보내기" }).click();
+    await parent.getByRole("article").filter({ hasText: message }).getByText(reply).waitFor();
+    const inquiry = result(await admin.from("classroom_inquiries").select("category,priority,summary")
+      .eq("classroom_id", classId).eq("message", message).single());
+    assert.equal(inquiry.category, category);
+    assert.equal(inquiry.priority, priority);
+    if (message.includes("모델 오류")) assert.match(inquiry.summary, /자동 분류 결과를 확인하지 못했습니다/);
+  }
+  await teacher.reload();
+  const inbox = teacher.getByRole("region", { name: "받은 문의" });
+  await inbox.getByText("악성민원 · 주의").waitFor();
+  await inbox.getByText("학부모가 학교 행사에 관한 상담을 요청했습니다.").waitFor();
+  await inbox.getByText("운동장에서 학생의 안전 확인을 즉시 요청했습니다.").waitFor();
   await teacher.getByText("학급 삭제", { exact: true }).click();
   await teacher.locator('[name=confirm]').check();
   await teacher.getByRole("button", { name: "학급 데이터 삭제" }).click();

@@ -257,3 +257,19 @@ main.teacher-dashboard .dashboard-panel, .dashboard-create {
 .dashboard-inquiry-meta [data-priority="medium"] { background: #f3eee1; color: #66501d; }
 .dashboard-inquiry-summary { white-space: pre-wrap; }
 .dashboard-inbox article a { justify-self: start; font-size: 14px; }
+
+.inquiry-message {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--selected);
+}
+
+.inquiry-message strong { font-size: 13px; color: var(--green); }
+.inquiry-message p { margin-top: 4px; white-space: pre-wrap; }
+.inquiry-reply { background: var(--canvas); }
+.class-conversation #inquiry-hint, .inquiry-submit [role="status"] {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.inquiry-submit { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
