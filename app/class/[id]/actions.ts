@@ -3,17 +3,37 @@ import { redirect } from "next/navigation";
 import { verificationContext } from "../../../lib/verification";
 import { classifyInquiry, selectSources } from "../../../lib/inquiry";
 
+const classroomUuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
+
+async function admit(
+  context: NonNullable<Awaited<ReturnType<typeof verificationContext>>>,
+  id: string,
+  code: string,
+) {
+  const { data, error } = await context.admin.rpc("join_classroom", {
+    class_id: id, entrant_id: context.user.id, presented_code: code,
+  });
+  return Boolean(data && !error);
+}
+
+export async function joinClassByCode(_previous: { invalid?: boolean }, form: FormData) {
+  const context = await verificationContext();
+  if (!context) redirect("/login?next=%2Fjoin");
+  const code = String(form.get("code") ?? "").trim();
+  if (!classroomUuid.test(code)) return { invalid: true };
+  const { data: classroom } = await context.admin.from("classrooms")
+    .select("id").eq("join_code", code).eq("published", true).maybeSingle();
+  if (!classroom || !await admit(context, classroom.id, code)) return { invalid: true };
+  redirect("/class/" + classroom.id);
+}
+
 export async function joinClass(id: string, form: FormData) {
   const context = await verificationContext();
   if (!context) redirect("/login?next=" + encodeURIComponent("/class/" + id));
   const code = String(form.get("code") ?? "").trim();
-  const uuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
-  if (!uuid.test(id)) redirect("/");
-  if (!uuid.test(code)) redirect("/class/" + id + "?result=invalid");
-  const { data, error } = await context.admin.rpc("join_classroom", {
-    class_id: id, entrant_id: context.user.id, presented_code: code,
-  });
-  redirect("/class/" + id + (data && !error ? "" : "?result=invalid"));
+  if (!classroomUuid.test(id)) redirect("/");
+  const admitted = classroomUuid.test(code) && await admit(context, id, code);
+  redirect("/class/" + id + (admitted ? "" : "?result=invalid"));
 }
 
 export async function sendInquiry(id: string, version: number, requestId: string, form: FormData) {

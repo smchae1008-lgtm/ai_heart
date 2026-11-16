@@ -50,7 +50,7 @@ export async function saveClass(previous: ClassFormState, form: FormData): Promi
   if (!validDate(record.starts_on)) errors.starts = "올바른 시작일을 입력해 주세요.";
   if (!validDate(record.ends_on)) errors.ends = "올바른 종료일을 입력해 주세요.";
   else if (!errors.starts && record.ends_on < record.starts_on) errors.ends = "종료일은 시작일과 같거나 이후여야 해요.";
-  if (record.published && !record.official_contact) errors.contact = "학부모 링크를 공개하려면 학교 공식 문의처를 입력해 주세요.";
+  if (record.published && !record.official_contact) errors.contact = "학부모 입장을 허용하려면 학교 공식 문의처를 입력해 주세요.";
   else if (record.official_contact.length > 300) errors.contact = "공식 문의처를 300자 이내로 입력해 주세요.";
   if (!record.greeting || record.greeting.length > 1000) errors.greeting = "첫인사를 1~1,000자로 입력해 주세요.";
   if (!Number.isInteger(record.tone) || record.tone < 1 || record.tone > 5) errors.tone = "말투를 선택해 주세요.";

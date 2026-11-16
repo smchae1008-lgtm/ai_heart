@@ -27,5 +27,5 @@ export async function login(state: LoginState, form: FormData): Promise<LoginSta
   const { error } = await client.auth.verifyOtp({ email, token, type: "email" });
   if (error) return { email, error: "인증 코드가 일치하지 않거나 만료됐습니다." };
   const next = String(form.get("next") ?? "");
-  redirect(/^\/class\/[0-9a-f-]{36}$/i.test(next) ? next : "/account");
+  redirect(next === "/join" || /^\/class\/[0-9a-f-]{36}$/i.test(next) ? next : "/account");
 }

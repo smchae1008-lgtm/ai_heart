@@ -43,6 +43,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <p>{account.email}</p>
         </div>
         {account.app_metadata?.maeumi_role === "operator" && <a href="/operations">교원 인증 검토</a>}
+        <a href="/join">학급 코드로 입장</a>
       </header>
       <section className="dashboard-panel" aria-label="교원 인증">
         <h2>{year}학년도 교원 인증</h2>
@@ -85,8 +86,10 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               <h3>{classroom.name}</h3>
               <p>현재 코드 입장 계정 {count ?? "확인 불가"}</p>
             </div>
-            {classroom.published && <a href={"/class/" + classroom.id}>학부모 링크 열기</a>}
           </header>
+          {!classroom.deleting && <p>{classroom.published
+            ? "학부모에게 아래 학급 코드를 전달해 주세요."
+            : "학부모 입장 비공개 · 학급 설정에서 공식 문의처를 입력하고 학부모 입장을 허용해 주세요."}</p>}
           <p className="dashboard-class-code">학급 코드 <code>{classroom.join_code}</code></p>
           {!classroom.deleting && <><form action={rotateCode}>
             <input type="hidden" name="id" value={classroom.id} />
